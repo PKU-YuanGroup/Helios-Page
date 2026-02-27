@@ -1,0 +1,2653 @@
+<html lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+    <meta name="description"
+        content="Helios: 14B Real-Time Long Video Generation Model can be Cheaper, Faster but Keep Stronger than 1.3B ones">
+    <meta name="keywords" content="Video generation, Diffusion model">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#EDE8F5">
+    <meta property="og:image" content="">
+    <link rel="stylesheet" href="./assets/index.css">
+    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.2/css/bootstrap.min.css'>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+        @font-face {
+            font-family: 'Roboto';
+            font-style: normal;
+            font-stretch: 100%;
+            font-display: block;
+            font-weight: 300 700;
+            src: url('./assets/roboto.woff2') format('woff2');
+            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+        }
+
+        @font-face {
+            font-family: 'DancingScript';
+            src: url('./assets/DancingScript-Bold.ttf') format('truetype');
+        }
+
+        @font-face {
+            font-family: 'Caveat';
+            src: url('./assets/Caveat-Medium.ttf') format('truetype');
+        }
+
+        @font-face {
+            font-family: 'Alegreya';
+            src: url('./assets/Alegreya-Regular.ttf') format('truetype');
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        .abstract-section {
+            padding: 40px 5% 20px 5%;
+            /* 上 40，下 20 */
+            margin-top: 40px;
+        }
+
+        .abstract-section+#teaser-section {
+            margin-top: 10px !important;
+        }
+
+
+        video {
+            background-color: #000000;
+            aspect-ratio: 16 / 9;
+        }
+
+        section.portrait video {
+            background-color: #000000;
+            aspect-ratio: 16 / 9;
+            object-fit: cover;
+        }
+
+        section.multi_ip video {
+            background-color: #000000;
+            aspect-ratio: 4 / 3;
+            object-fit: cover;
+        }
+
+        section.portrait .prompt-wrap.full-screen-wrap video {
+            object-fit: cover;
+        }
+
+        section.portrait .flex {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-start;
+            gap: 10px;
+        }
+
+        section.portrait2 .flex {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: flex-start;
+        }
+
+        section.portrait .flex>div {
+            flex: 0 0 calc((100% - 5 * 10px) / 6);
+        }
+
+        section.portrait2 .flex>div {
+            flex: 0 0 calc((100% - 1 * 10px) / 2);
+        }
+
+        section.portrait .prompt {
+            font-size: 10px;
+        }
+
+        section.portrait2 .prompt {
+            font-size: 12px;
+        }
+
+        section.portrait .flex-row {
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+        }
+
+        section.portrait2 .flex-row {
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+        }
+
+        @media (max-width: 768px) {
+            section.portrait .flex>div {
+                flex: 0 0 calc((100% - 1 * 10px) / 2);
+            }
+        }
+
+        @media (max-width: 768px) {
+            section.portrait2 .flex>div {
+                flex: 0 0 calc((100% - 0 * 10px) / 1);
+            }
+        }
+
+        /* Ensure prompt adjusts for portrait mode */
+        .portrait .prompt {
+            position: absolute;
+            /* Allow positioning relative to the container */
+            bottom: 5%;
+            /* Adjust this to control the vertical placement of the prompt */
+            left: 50%;
+            /* Center horizontally */
+            transform: translateX(-50%);
+            /* Offset by 50% of its width to truly center */
+            max-width: 80%;
+            text-align: center;
+            /* Center the text inside the prompt */
+            color: white;
+            /* Optional, if you want the text to stand out */
+            font-size: 1.2em;
+            /* Optional, adjust the text size */
+        }
+
+        .portrait2 .prompt {
+            position: absolute;
+            /* Allow positioning relative to the container */
+            bottom: 5%;
+            /* Adjust this to control the vertical placement of the prompt */
+            left: 50%;
+            /* Center horizontally */
+            transform: translateX(-50%);
+            /* Offset by 50% of its width to truly center */
+            max-width: 80%;
+            text-align: center;
+            /* Center the text inside the prompt */
+            color: white;
+            /* Optional, if you want the text to stand out */
+            font-size: 1.2em;
+            /* Optional, adjust the text size */
+        }
+
+        body {
+            background-color: #000000;
+            color: #ffffff;
+            font-family: "Roboto", sans-serif;
+            padding: 0;
+            margin: 0;
+        }
+
+        #intro {
+            padding: 40px 0 20px 0;
+            justify-content: center;
+            text-align: center;
+            background: transparent;
+            color: #ffffff;
+            position: relative;
+            height: auto;
+            width: 100%;
+        }
+
+
+        #background-video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            /* 视频填充整个容器 */
+            z-index: -1;
+            /* 确保视频在内容后面 */
+            filter: brightness(0.3);
+            /* 调低亮度，使视频更暗 */
+        }
+
+        #intro h1 {
+            font-size: 90px;
+            font-weight: 300;
+            margin: 20px 0;
+        }
+
+        #intro h2 {
+            margin: 20px 0 40px 0;
+            font-weight: 300;
+            color: #ffffff
+        }
+
+        #intro h2 strong {
+            color: #fff;
+        }
+
+        .authors {
+            font-size: 16px;
+            font-weight: 500;
+            color: #ffffff;
+            text-align: center;
+            margin-bottom: 25px;
+            width: 80%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .author-block {
+            display: inline-block;
+            margin: 0 10px 0 10px;
+        }
+
+        .author-block a {
+            color: #ffffff;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .author-block a:hover {
+            color: #fff;
+        }
+
+        .author-affiliation {
+            font-size: 16px;
+            color: #ffffff;
+            text-align: center;
+            margin-bottom: 60px;
+            width: 80%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .author-affiliation .author-block {
+            display: inline-block;
+            margin: 0 15px;
+        }
+
+        section {
+            max-width: 1920px;
+            margin: 0 auto;
+        }
+
+        .content {
+            padding: 0 10%;
+        }
+
+        .button {
+            background-color: #ccc;
+            color: #000;
+            padding: 10px 20px;
+            border-radius: 100px;
+            cursor: pointer;
+            transition: background-color 0.5s;
+            text-decoration: none;
+            margin-right: 8px;
+            margin-bottom: 8px;
+            display: inline-block;
+        }
+
+        .button:hover {
+            background-color: #fff;
+        }
+
+        .bibtex-section {
+            background-color: #111;
+            padding: 40px 10%;
+            text-align: center;
+            margin-top: 60px;
+            color: #ccc;
+        }
+
+        .bibtex-section h3 {
+            font-size: 24px;
+            font-weight: 400;
+            color: #ccc;
+            margin-bottom: 20px;
+        }
+
+        .bibtex-code {
+            background-color: #222;
+            color: #ddd;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: left;
+            display: inline-block;
+            font-family: monospace;
+            max-width: 800px;
+            overflow-x: auto;
+        }
+
+        section:first-of-type {
+            margin-top: 0;
+        }
+
+        .title {
+            background-color: #000;
+            position: sticky;
+            top: 0;
+            padding: 20px 10%;
+            font-size: 20px;
+            font-weight: 600;
+            z-index: 1000;
+            min-height: 60px;
+            box-sizing: border-box;
+        }
+
+        .description {
+            padding: 0 10% 20px 10%;
+            color: #999;
+            line-height: 25px;
+            font-weight: 300;
+        }
+
+        .highlight {
+            color: #fff;
+            font-weight: 500;
+        }
+
+        .flex-row {
+            display: flex;
+            column-gap: 5px;
+            flex-wrap: nowrap;
+            justify-content: space-between;
+            padding: 0 5px 5px 5px;
+
+        }
+
+        .flex-row>div {
+            flex-grow: 1;
+            flex-basis: 0;
+            position: relative;
+        }
+
+        .flex>div {
+            width: calc(100% / 3 - 5px * 2 / 3);
+            margin-top: 2.5px;
+            margin-bottom: 2.5px;
+            position: relative;
+        }
+
+        .flex {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            padding: 0 5px;
+        }
+
+        .prompt-wrap {
+            position: relative;
+        }
+
+        .flex-2 {
+            justify-content: center;
+            column-gap: 5px;
+        }
+
+        .flex-2>div {
+            width: calc(100% / 2 - 5px / 2);
+            min-width: calc(100% / 3 - 5px * 2 / 3);
+            max-width: calc(100vh - 200px);
+        }
+
+        video,
+        img {
+            width: 100%;
+        }
+
+        .loading-placeholder {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            color: rgba(255, 255, 255, 0.6);
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        .loading-text {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .loading-icon {
+            font-size: 48px;
+        }
+
+        .prompt {
+            max-width: calc(100% - 20px);
+            position: absolute;
+            background: rgba(0, 0, 0, 0.5);
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 10px;
+            backdrop-filter: blur(10px);
+            bottom: 10px;
+            left: 10px;
+            padding: 5px 10px;
+            border-radius: 15px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s;
+            box-sizing: border-box;
+        }
+
+        .flex-very-compact .full-screen-button {
+            width: 100%;
+            height: 100%;
+            top: 0;
+            right: 0;
+            border-radius: 0;
+        }
+
+        .chinese {
+            font-family: 'Noto Sans SC', sans-serif;
+            font-weight: bold;
+            color: #d18585;
+            font-size: 1.1em;
+        }
+
+        @media (hover: hover) {
+
+            .prompt-wrap:hover .prompt,
+            .full-screen-wrap:hover .full-screen-button {
+                opacity: 1;
+                pointer-events: all;
+            }
+
+            #contributors a:hover {
+                background-color: #222;
+            }
+        }
+
+        @media (hover: none) {
+            #contributors a {
+                pointer-events: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .flex-dynamic>div {
+                width: calc(100% / 2 - 5px / 2);
+            }
+        }
+
+        @media (max-width: 640px) {
+            #intro h1 {
+                font-size: 50px;
+            }
+
+            #intro h2 {
+                font-size: 20px;
+            }
+
+            .ruler {
+                font-size: 10px;
+            }
+        }
+
+        @media (max-width: 512px) {
+
+            .flex-dynamic>div,
+            .flex-dynamic-1>div {
+                width: 100%;
+            }
+
+            .content {
+                padding: 0 12px;
+            }
+
+            .description {
+                padding: 0 12px 20px 12px;
+            }
+
+            .title {
+                padding: 20px 12px;
+            }
+
+            .ruler-tight {
+                font-size: 6px;
+                column-gap: 0;
+            }
+
+            .title-long {
+                font-size: 16px;
+            }
+
+        }
+
+        .margin-top {
+            margin-top: 50px;
+        }
+
+        .ruler {
+            text-align: center;
+            position: sticky;
+            top: 60px;
+            z-index: 999;
+            background-color: #000;
+            color: #999;
+            padding: 5px 0;
+        }
+
+        .ruler>div {
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .selected {
+            box-shadow: 0 0 0 5px #fff;
+        }
+
+        #title-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #title-icon {
+            height: 8em;
+            width: auto;
+            margin-right: 0px;
+            vertical-align: middle;
+        }
+
+        .title-art {
+            font-family: 'DancingScript', sans-serif;
+        }
+
+        .title-art2 {
+            font-family: 'Caveat', sans-serif;
+
+            background: linear-gradient(90deg,
+                    #dc2626,
+                    #ffffff,
+                    #6692f1);
+
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: transparent;
+        }
+
+
+        .title-art3 {
+            font-family: 'Alegreya', sans-serif;
+        }
+
+        .gradient {
+            background: linear-gradient(90deg, #4eb2ff .39%, #c3a0ff 51.23%, #ffa76d 100%);
+            background-clip: text;
+            color: transparent;
+        }
+
+        .title-art4 {
+            margin-top: 0px;
+            color: white;
+            font-size: 3.837rem;
+            text-align: center;
+        }
+
+        h2 {
+            font-size: 2.5em;
+            color: rgb(255, 255, 255);
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+        }
+
+        #video-wrapper {
+            border-radius: 50px;
+            max-width: 720px;
+            padding-bottom: 40%;
+            margin: 0 auto;
+            background: #000000;
+        }
+
+        .ethics-section {
+            padding: 100px 10%;
+            text-align: center;
+            margin-top: 60px;
+            color: #ccc;
+            max-width: 1500px;
+            margin: 0 auto;
+        }
+
+        .acknowledgements-section {
+            padding: 100px 10%;
+            text-align: center;
+            margin-top: 60px;
+            color: #ccc;
+            max-width: 1500px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var lazyVideos = [].slice.call(document.querySelectorAll("video.lazy-video"));
+
+        if ("IntersectionObserver" in window) {
+            var videoObserver = new IntersectionObserver(function (entries, observer) {
+                entries.forEach(function (video) {
+                    if (video.isIntersecting) {
+                        if (video.target.dataset.src) {
+                            video.target.src = video.target.dataset.src;
+                        }
+                        video.target.load();
+                        video.target.play();
+                        videoObserver.unobserve(video.target);
+                    }
+                });
+            }, {
+                rootMargin: "0px 0px 200px 0px"
+            });
+
+            lazyVideos.forEach(function (video) {
+                videoObserver.observe(video);
+            });
+        }
+    });
+</script>
+
+<body>
+
+    <div id="main-content">
+        <!-- Your whole original webpage content goes below this -->
+
+
+
+        <!-- 全局背景视频 -->
+        <style>
+            /* 全局背景视频 */
+            #background-video {
+                position: fixed;
+                top: 0;
+                left: 0;
+
+                width: 100vw;
+                height: 100vh;
+
+                object-fit: cover;
+                z-index: -1;
+                pointer-events: none;
+                opacity: 0.85;
+            }
+        </style>
+        <video autoplay muted loop id="background-video">
+            <source src="./videos/0_grid_output.mp4" type="video/mp4">
+        </video>
+        <!-- ====================== -->
+        <!--   Intro  -->
+        <!-- ====================== -->
+        <section id="intro">
+
+            <div class="content">
+                <!-- <div id="title-container">
+                    <img id="title-icon" src="./assets/icon-new.png" alt="Icon">
+                </div> -->
+                <h2 class="title-art4"><strong><span class="gradient">Helios:</span> 14B Real-Time Long Video Generation
+                        Model can be Cheaper, Faster but Keep Stronger than
+                        1.3B ones</strong></h2>
+
+                <div class="authors">
+                    <span class="author-block" style="font-size: 20px;">
+                        <a href="https://shyuanbest.github.io/">
+                            Shenghai Yuan<sup>1,2</sup>
+                        </a>
+                    </span>
+                    <span class="author-block" style="font-size: 20px;">
+                        <a href="">
+                            Yuanyang Yin<sup>2</sup>
+                        </a>
+                    </span>
+                    <span class="author-block" style="font-size: 20px;">
+                        <a href="">
+                            Xinwei Huang<sup>2</sup>
+                        </a>
+                    </span>
+                    <span class="author-block" style="font-size: 20px;">
+                        <a href="">
+                            Xiao Yang<sup>3, &sect;</sup>
+                        </a>
+                    </span>
+                    <span class="author-block" style="font-size: 20px;">
+                        <a href="https://yuanli2333.github.io/">
+                            Li Yuan<sup>1,&dagger;</sup>
+                        </a>
+                    </span>
+                </div>
+
+
+                <!-- Added the affiliations section -->
+                <div class="author-affiliation" style="font-size: 25px; font-family: 'Times New Roman', sans-serif;">
+                    <p>
+                        <sup>1</sup> Peking University &nbsp;&nbsp;
+                        <sup>2</sup> ByteDance &nbsp;&nbsp;
+                        <sup>3</sup> Canva
+                    </p>
+                </div>
+
+
+                <a class="button" href="https://github.com/PKU-YuanGroup/Helios" target="_blank"
+                    rel="noopener noreferrer">
+                    <i class="fa-brands fa-github" style="font-size:17px; margin-right:6px;"></i>
+                    GitHub
+                </a>
+                <a class="button" href="https://arxiv.org/abs/2" target="_blank" rel="noopener noreferrer">
+                    <i class="fa-regular fa-file-lines" style="font-size:17px; margin-right:6px;"></i>
+                    Arxiv
+                </a>
+                <a class="button" href="https://huggingface.co/papers/" target="_blank" rel="noopener noreferrer">
+                    <i class="fa-solid fa-robot" style="font-size:17px; margin-right:6px;"></i>
+                    Hugging Face
+                </a>
+                <a class="button" href="https://youtu.be/" target="_blank" rel="noopener noreferrer">
+                    <i class="fa-brands fa-youtube" style="font-size:17px; margin-right:6px;"></i>
+                    Video
+                </a>
+
+
+            </div>
+
+        </section>
+
+        <!-- 文本标题 -->
+        <div class="container text-center" style="margin-top: 50px;">
+            <p class="title-art3" style="font-size: 1.6em;">
+                <!-- A video demonstrating Helios's main features -->
+                Main Features
+            </p>
+        </div>
+
+
+        <!-- 视频主体 -->
+        <div id="video-demo" class="show-neighbors"
+            style="display: flex; justify-content: center; flex-direction: column; margin-top: 30px; margin-bottom: 40px;">
+            <div style="display: flex; justify-content: center;">
+                <div style="
+     border: 4px solid #ffffff44;
+     border-radius: 2vmin;
+     padding: 8px;
+     background: #1c1c1c;
+     box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+     ">
+                    <video src="./assets/video_demo.mp4" playsinline controls style="
+         width: 90vw;
+         max-width: 1000px;
+         aspect-ratio: 16 / 10;
+         object-fit: contain;
+         border-radius: 2vmin;
+         background: black;
+         display: block;
+         "></video>
+                </div>
+            </div>
+        </div>
+
+        <div class="container text-center" style="margin-top: 50px;">
+            <p class="title-art3" style="font-size: 1.6em;">Inference Speed
+            </p>
+        </div>
+
+
+        <!-- 视频主体 -->
+        <div id="video-demo" class="show-neighbors"
+            style="display: flex; justify-content: center; flex-direction: column; margin-top: 30px; margin-bottom: 40px;">
+            <div style="display: flex; justify-content: center;">
+                <div style="
+     border: 4px solid #ffffff44;
+     border-radius: 2vmin;
+     padding: 8px;
+     background: #1c1c1c;
+     box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+     ">
+                    <video src="./videos/ete_throughput.mp4" playsinline controls style="
+         width: 90vw;
+         max-width: 1000px;
+         aspect-ratio: 16 / 10;
+         object-fit: contain;
+         border-radius: 2vmin;
+         background: black;
+         display: block;
+         "></video>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================= -->
+        <!--   Abstract Section    -->
+        <!-- ========================= -->
+
+        <section class="acknowledgements-section abstract-section">
+            <div style="
+                max-width: 1400px;
+                margin: 0 auto;
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                border-radius: 12px;
+                padding: 40px;
+                background-color: rgba(255, 255, 255, 0.05);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+                backdrop-filter: blur(4px);
+            ">
+                <h3 style="
+                    text-align: center;
+                    font-weight: bold;
+                    font-size: 1.8rem;
+                    margin-bottom: 1rem;
+                    color: white;
+                ">
+                    <strong><span class="gradient">Abstract</span></strong>
+                </h3>
+
+                <p style="
+                    font-size: 1.05rem;
+                    line-height: 1.6;
+                    color: white;
+                    text-align: left;
+                    text-indent: 0em;
+                ">
+                    <span style="text-decoration: underline;">
+                        <em>We introduce <strong>Helios</strong>, the first 14B video generation model that runs at
+                            <strong>19.5 FPS on a single</strong> NVIDIA H100 GPU and supports minute-scale generation
+                            while
+                            matching the quality of a strong baseline.</em>
+                    </span>
+                    We make breakthroughs along three key dimensions:
+                    <strong>(1)</strong> <em>robustness to long-video drifting without commonly used anti-drifting
+                        heuristics</em>
+                    such as self-forcing, error-banks, or keyframe sampling;
+                    <strong>(2)</strong> <em>real-time generation without standard acceleration techniques</em>
+                    such as KV-cache, sparse/linear attention, or quantization; and
+                    <strong>(3)</strong> <em>training without parallelism or sharding frameworks</em>,
+                    enabling image-diffusion-scale batch sizes while fitting up to four 14B models within 80 GB of GPU
+                    memory.
+                    Specifically, <strong>Helios</strong> is a <strong>14B autoregressive diffusion model</strong>
+                    with a unified input representation that natively supports T2V, I2V, and V2V tasks.
+                    To mitigate drifting in long-video generation, we characterize typical failure modes and propose
+                    simple
+                    yet effective training strategies that explicitly simulate drifting during training, while
+                    eliminating
+                    repetitive motion at its source. For efficiency, we heavily compress the historical and noisy
+                    context
+                    and reduce the number of sampling steps, yielding computational costs comparable to&mdash;or lower
+                    than&mdash;those of 1.3B video generative models. Moreover, we introduce infrastructure-level
+                    optimizations that accelerate both inference and training while reducing memory consumption.
+                    Extensive experiments demonstrate that <strong>Helios</strong> consistently outperforms
+                    prior methods on both short- and long-video generation.
+
+                    We release the code, base model, and distilled model to support development.
+                </p>
+            </div>
+        </section>
+
+        <!-- ========================= -->
+        <!--   Teaser Image Section    -->
+        <!-- ========================= -->
+
+        <section id="teaser-section" style="margin: 10px auto 40px auto; padding: 0 20px;">
+
+            <h3 style="text-align:center; color:white; font-size: 2rem; margin-bottom: 20px;">
+                <strong><span class="gradient">Performance Comparison</span></strong>
+            </h3>
+
+            <p style="
+                color: #ccc;
+                font-size: 1.1rem;
+                line-height: 1.6;
+                text-align: left;
+                text-indent: 2em;
+                max-width: 1000px;
+                margin: 0 auto 25px auto;
+            ">
+            </p>
+
+            <div style="width: 100%; display: flex; flex-direction: column; align-items: center; margin-bottom: 40px;">
+                <div style="width: 100%; display: flex; justify-content: center; border-radius: 12px;">
+                    <img src="figures/highlight_speed.png" alt="Highlight Speed" style="
+                        width: 100%; 
+                        max-width: 1100px; 
+                        border-radius: 10px; 
+                        box-shadow: 0 0 20px rgba(255,255,255,0.1);
+                    ">
+                </div>
+                <p
+                    style="color: #ccc; font-size: 0.95rem; line-height: 1.5; max-width: 1100px; margin-top: 15px; text-align: left;">
+                    <strong>End-to-end throughput (FPS) of various video generation models on a single H100.</strong>
+                    The results are obtained at the same resolution with all official acceleration techniques, including
+                    FlashAttention, torch compile, and KV-cache. Helios is substantially faster than models at the same
+                    scale and matches the speed of smaller distilled ones.
+                </p>
+            </div>
+
+            <div style="width: 100%; display: flex; flex-direction: column; align-items: center; margin-bottom: 40px;">
+                <div style="width: 100%; display: flex; justify-content: center; border-radius: 12px;">
+                    <img src="figures/highlight_performance.png" alt="Highlight Performance" style="
+                        width: 100%; 
+                        max-width: 1100px; 
+                        border-radius: 10px; 
+                        box-shadow: 0 0 20px rgba(255,255,255,0.1);
+                    ">
+                </div>
+                <p
+                    style="color: #ccc; font-size: 0.95rem; line-height: 1.5; max-width: 1100px; margin-top: 15px; text-align: left;">
+                    <strong>Benchmark performance of Helios and its counterparts.</strong>
+                    For both short- and long-video generation, Helios consistently outperforms existing distilled models
+                    while achieving performance comparable to that of base models.
+                </p>
+            </div>
+
+        </section>
+
+        <!-- ========================================================== -->
+        <!--  Helios Qualitative Results        -->
+        <!-- ========================================================== -->
+        <style>
+            /* Task buttons */
+            .task-selector {
+                text-align: center;
+                margin-bottom: 25px;
+            }
+
+            .task-selector button {
+                background: #222;
+                color: #fff;
+                border: 1px solid #555;
+                padding: 10px 18px;
+                margin: 5px;
+                border-radius: 8px;
+                cursor: pointer;
+                font-size: 16px;
+                transition: 0.3s;
+            }
+
+            .task-selector button:hover {
+                background: #444;
+            }
+
+            .task-selector .active {
+                background: #0066ff;
+                border-color: #3399ff;
+            }
+
+            /* Case switch buttons */
+            .case-switcher {
+                text-align: center;
+                margin-bottom: 15px;
+            }
+
+            .case-switcher button {
+                background: #111;
+                color: #fff;
+                border: 1px solid #444;
+                padding: 6px 15px;
+                margin: 0 15px;
+                border-radius: 6px;
+                font-size: 16px;
+                cursor: pointer;
+            }
+
+            .case-switcher button:hover {
+                background: #333;
+            }
+
+            /* Video grid */
+            .video-grid {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 18px;
+                max-width: 1400px;
+                margin: 0 auto;
+            }
+
+            .video-item {
+                position: relative;
+            }
+
+            .video-item video {
+                width: 100%;
+                border-radius: 12px;
+                border: 2px solid #333;
+            }
+
+            .video-title {
+                position: absolute;
+                top: 8px;
+                left: 8px;
+                background: rgba(0, 0, 0, 0.55);
+                padding: 4px 10px;
+                border-radius: 6px;
+                color: #fff;
+                font-size: 14px;
+                font-weight: 600;
+                pointer-events: none;
+            }
+
+            #task-prompt {
+                text-align: center;
+                color: #ccc;
+                margin-top: 25px;
+                font-size: 18px;
+                font-style: italic;
+                padding-bottom: 40px;
+            }
+
+            /* Wrapper to hold left/right buttons + videos */
+            .video-wrapper {
+                position: relative;
+                width: 100%;
+                max-width: 1500px;
+                margin: 0 auto;
+            }
+
+            /* Left/right case buttons */
+            .case-btn {
+                position: absolute;
+                top: 50%;
+                transform: translateY(-50%);
+                background: rgba(0, 0, 0, 0.45);
+                color: white;
+                border: none;
+                font-size: 42px;
+                padding: 10px 16px;
+                cursor: pointer;
+                border-radius: 8px;
+                transition: 0.25s;
+                z-index: 20;
+            }
+
+            .case-btn:hover {
+                background: rgba(0, 0, 0, 0.75);
+            }
+
+            .left-btn {
+                left: -60px;
+                /* 位置可调 */
+            }
+
+            .right-btn {
+                right: -60px;
+                /* 位置可调 */
+            }
+
+            .case-header {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                justify-content: center;
+                /* ⭐ 强制内容整体居中 */
+
+                gap: 40px;
+
+                width: 100%;
+                max-width: 1500px;
+                /* ⭐ 与视频区域对齐 */
+                margin: 0 auto 35px auto;
+                /* ⭐ 居中 */
+
+                padding: 10px 20px;
+            }
+
+            .case-header img {
+                width: 260px;
+                border-radius: 12px;
+                border: 2px solid #333;
+            }
+
+            .case-header .prompt-box {
+                flex: 1;
+                max-width: 700px;
+                /* ⭐ 限制宽度使其居中视觉更平衡 */
+                text-align: left;
+                font-size: 18px;
+                line-height: 1.5;
+                color: #ddd;
+            }
+        </style>
+
+        <!-- ========================================================== -->
+        <!--  NEW SECTION: 3 Long Video Qualitative Results            -->
+        <!-- ========================================================== -->
+
+        <section id="task-long" style="margin-top:80px;">
+            <h3 style="text-align:center; font-size:2rem; color:white; margin-bottom:20px;">
+                <strong><span class="gradient">Long Video Comparison (~1440 Frames)</span></strong>
+            </h3>
+
+            <div class="task-selector">
+                <button class="task-btn active" onclick="renderLong('prompt1', this)">Prompt 1</button>
+                <button class="task-btn" onclick="renderLong('prompt2', this)">Prompt 2</button>
+                <button class="task-btn" onclick="renderLong('prompt3', this)">Prompt 3</button>
+                <button class="task-btn" onclick="renderLong('prompt4', this)">Prompt 4</button>
+            </div>
+
+            <div id="long-header" class="case-header"></div>
+            <div class="video-wrapper">
+                <div id="long-video-container" class="video-grid" style="grid-template-columns: repeat(3, 1fr);"></div>
+            </div>
+        </section>
+
+        <script>
+            /* Configuration: 
+               Each prompt defines its own text and the specific models to display.
+               You can change the models array for each prompt individually.
+            */
+            const promptData_Long = {
+                prompt1: {
+                    text: "A movie trailer in a classic cinematic style, featuring the adventurous journey of a 30-year-old space man wearing a vibrant red wool knitted motorcycle helmet. The scene unfolds against a vast blue sky and a desolate salt desert landscape. Shot on 35mm film, the trailer showcases vivid and rich colors, capturing the hero as he navigates through the harsh terrain with determination. His helmet glints under the sun, adding to the dramatic effect. The background is a mix of sweeping desert vistas and distant horizons, with the occasional shimmer of light reflecting off the salt flats. A dynamic medium shot with a sweeping overhead angle, emphasizing the hero's resilience and the vastness of his adventure.",
+                    // Define specific models for this prompt
+                    models: [
+                        { id: "helios", name: "Helios" },
+                        { id: "pyramidalflow", name: "Pyramid Flow" },
+                        { id: "magi-1-4.5B", name: "MAGI-1" },
+                        { id: "infinitystar", name: "InfinityStar" },
+                        { id: "skyreelsV2_1.3B", name: "SkyReels V2 DF 1.3B" },
+                        { id: "skyreelsV2_14B", name: "SkyReels V2 DF 14B" },
+                        { id: "causvid", name: "CausVid" },
+                        { id: "self_forcing", name: "Self Forcing" },
+                        { id: "rollingforcing", name: "Rolling Forcing" }
+                    ],
+                    suffix: "3"
+                },
+                prompt2: {
+                    text: "A dynamic shot from behind a white vintage SUV with a black roof rack as it speeds up a steep dirt road surrounded by towering redwood trees on a rugged mountain slope. Dust kicks up from its tires, and the sunlight shines on the SUV, casting a warm glow over the scene. The dirt road curves gently into the distance, with no other vehicles in sight. The trees on either side are dense redwoods, with patches of greenery scattered throughout. The car navigates the curve with ease, making it seem as if it is on a thrilling drive through the rugged terrain. The dirt road is framed by steep hills and mountains, with a clear blue sky above and wispy clouds drifting by. The camera captures the vehicle from the rear, emphasizing its powerful and adventurous journey.",
+                    models: [
+                        { id: "helios", name: "Helios" },
+                        { id: "longlive", name: "LongLive" },
+                        { id: "infiniteforcing", name: "Infinite Forcing" },
+                        { id: "rewardforcing", name: "Reward Forcing" },
+                        { id: "causal_forcing", name: "Causal Forcing" },
+                        { id: "dummyforcing-longlive", name: "Dummy Forcing" },
+                        { id: "sana-video-long", name: "SANA Video Long" },
+                        { id: "krea", name: "Krea" },
+                        { id: "longcat", name: "LongCat-Video" }
+                    ],
+                    suffix: "18"
+                },
+                prompt3: {
+                    text: "A stylish woman strolls down a bustling Tokyo street, the warm glow of neon lights and animated city signs casting vibrant reflections. She wears a sleek black leather jacket paired with a flowing red dress and black boots, her black purse slung over her shoulder. Sunglasses perched on her nose and a bold red lipstick add to her confident, casual demeanor. The street is damp and reflective, creating a mirror-like effect that enhances the colorful lights and shadows. Pedestrians move about, adding to the lively atmosphere. The scene is captured in a dynamic medium shot with the woman walking slightly to one side, highlighting her graceful strides.",
+                    // Define specific models for this prompt
+                    models: [
+                        { id: "helios", name: "Helios" },
+                        { id: "pyramidalflow", name: "Pyramid Flow" },
+                        { id: "magi-1-4.5B", name: "MAGI-1" },
+                        { id: "infinitystar", name: "InfinityStar" },
+                        { id: "skyreelsV2_1.3B", name: "SkyReels V2 DF 1.3B" },
+                        { id: "skyreelsV2_14B", name: "SkyReels V2 DF 14B" },
+                        { id: "causvid", name: "CausVid" },
+                        { id: "self_forcing", name: "Self Forcing" },
+                        { id: "rollingforcing", name: "Rolling Forcing" }
+                    ],
+                    suffix: "1"
+                },
+                prompt4: {
+                    text: "A handheld tracking shot following a red balloon floating above the ground in an abandoned street. The balloon drifts gracefully, its bright red color contrasting sharply against the decaying urban backdrop. The street is littered with debris and graffiti-covered walls, with broken windows and rusted cars scattered about. Shadows dance across the scene as sunlight filters through gaps in the buildings. The camera moves fluidly, capturing the balloon's gentle ascent and descent, emphasizing its playful motion. A close-up of the balloon transitions to a wider shot, showcasing the desolate environment.",
+                    models: [
+                        { id: "helios", name: "Helios" },
+                        { id: "longlive", name: "LongLive" },
+                        { id: "infiniteforcing", name: "Infinite Forcing" },
+                        { id: "rewardforcing", name: "Reward Forcing" },
+                        { id: "causal_forcing", name: "Causal Forcing" },
+                        { id: "dummyforcing-longlive", name: "Dummy Forcing" },
+                        { id: "sana-video-long", name: "SANA Video Long" },
+                        { id: "krea", name: "Krea" },
+                        { id: "longcat", name: "LongCat-Video" }
+                    ],
+                    suffix: "76"
+                },
+            };
+
+            function renderLong(promptKey, btn) {
+                const data = promptData_Long[promptKey];
+                if (!data) return;
+                if (btn) {
+                    const btns = btn.parentNode.querySelectorAll('.task-btn');
+                    btns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                }
+                document.getElementById("long-header").innerHTML = `<div class="prompt-box">${data.text}</div>`;
+                const container = document.getElementById("long-video-container");
+                container.innerHTML = "";
+                data.models.forEach(model => {
+                    const videoPath = `./videos/long_video_comparison/${model.id}_${data.suffix}.mp4`;
+                    container.innerHTML += `
+                    <div class="video-item">
+                        <div class="loading-placeholder"><div class="loading-text">Loading ...</div></div>
+                        <div class="video-title">${model.name}</div>
+                        
+                        <video autoplay muted playsinline loop class="lazy-video"
+                            onloadeddata="this.parentElement.querySelector('.loading-placeholder').style.display='none'">
+                            <source src="${videoPath}" type="video/mp4">
+                        </video>
+                    </div>`;
+                });
+            }
+            renderLong("prompt1"); // 初始化
+        </script>
+
+        <!-- ========================================================== -->
+        <!--  NEW SECTION: 4 Short Video Qualitative Results            -->
+        <!-- ========================================================== -->
+
+        <section id="task-short" style="margin-top:80px;">
+            <h3 style="text-align:center; font-size:2rem; color:white; margin-bottom:20px;">
+                <strong><span class="gradient">Short Video Comparison (~121/81 Frames)</span></strong>
+            </h3>
+
+            <div class="task-selector">
+                <button class="task-btn active" onclick="renderShort('prompt1', this)">Prompt 1</button>
+                <button class="task-btn" onclick="renderShort('prompt2', this)">Prompt 2</button>
+                <button class="task-btn" onclick="renderShort('prompt3', this)">Prompt 3</button>
+                <button class="task-btn" onclick="renderShort('prompt4', this)">Prompt 4</button>
+            </div>
+
+            <div id="short-header" class="case-header"></div>
+            <div class="video-wrapper">
+                <div id="short-video-container" class="video-grid" style="grid-template-columns: repeat(3, 1fr);"></div>
+            </div>
+        </section>
+
+        <script>
+            /* Configuration: 
+               Each prompt defines its own text and the specific models to display.
+               You can change the models array for each prompt individually.
+            */
+            const promptData_Short = {
+                prompt1: {
+                    text: "A vibrant tropical fish swimming gracefully among colorful coral reefs in a clear, turquoise ocean. The fish has bright blue and yellow scales with a small, distinctive orange spot on its side, its fins moving fluidly. The coral reefs are alive with a variety of marine life, including small schools of colorful fish and sea turtles gliding by. The water is crystal clear, allowing for a view of the sandy ocean floor below. The reef itself is adorned with a mix of hard and soft corals in shades of red, orange, and green. The photo captures the fish from a slightly elevated angle, emphasizing its lively movements and the vivid colors of its surroundings. A close-up shot with dynamic movement.",
+                    models: [
+                        { id: "helios", name: "Helios" },
+                        { id: "fastvideo_14B", name: "FastVideoWan 2.1" },
+                        { id: "turbodiffusion-14B", name: "TurboDiffusion 2.1" },
+                        { id: "stepvideo_30B", name: "StepVideo-T2V" },
+                        { id: "kandinsky5-pro", name: "Kandinsky 5 pro" },
+                        { id: "kandinsky5-lite", name: "Kandinsky 5 lite" },
+                        { id: "ltxvideo-v2-19B", name: "LTX Video 2" },
+                        { id: "ltxvideo-v1-1.9B", name: "LTX Video 1.9B" },
+                        { id: "cogvideox_5B", name: "CogVideoX 1.5" },
+                    ],
+                    suffix: "59"
+                },
+                prompt2: {
+                    text: "An astronaut runs smoothly and appears almost weightless on the lunar surface, as seen from a low-angle shot that highlights the vast, desolate background of the moon. The moon's craters and rocky terrain are clearly visible, creating a stark contrast against the running astronaut who moves with graceful, fluid motions. The background features a muted, grayscale texture with subtle shadows and highlights, emphasizing the lunar landscape's rugged beauty. The astronaut wears a classic spacesuit with reflective fabric, adding to the sense of lightness and movement. A dynamic medium shot capturing the astronaut's forward momentum.",
+                    models: [
+                        { id: "helios", name: "Helios" },
+                        { id: "sana-video", name: "SANA Video" },
+                        { id: "wan2.2_14B", name: "Wan 2.2 14B" },
+                        { id: "wan2.1_14B", name: "Wan 2.1 14B" },
+                        { id: "wan2.2_5B", name: "Wan 2.2 5B" },
+                        { id: "wan2.1_1.3B", name: "Wan 2.1 1.3B" },
+                        { id: "hv-video-v2", name: "HV Video 1.5" },
+                        { id: "hv-video-v1", name: "HV Video" },
+                        { id: "mochi", name: "Mochi-1" },
+                    ],
+                    suffix: "61"
+                },
+                prompt3: {
+                    text: "A detailed oil painting in a romantic style, showcasing a young woman standing amidst a vibrant garden filled with blooming flowers. She wears a floral-patterned dress, her hair loosely tied with wildflowers adorning it. Her expression is one of serene joy, with a gentle smile on her lips. She is framed by a variety of colorful blooms, including roses, tulips, and daisies, which surround her in a natural, organic arrangement. The background features a soft, pastel-colored sky with fluffy clouds, and a gentle breeze rustling through the petals. A medium shot with a slightly tilted angle, capturing the essence of spring and renewal.",
+                    models: [
+                        { id: "helios", name: "Helios" },
+                        { id: "fastvideo_14B", name: "FastVideoWan 2.1" },
+                        { id: "turbodiffusion-14B", name: "TurboDiffusion 2.1" },
+                        { id: "stepvideo_30B", name: "StepVideo-T2V" },
+                        { id: "kandinsky5-pro", name: "Kandinsky 5 pro" },
+                        { id: "kandinsky5-lite", name: "Kandinsky 5 lite" },
+                        { id: "ltxvideo-v2-19B", name: "LTX Video 2" },
+                        { id: "ltxvideo-v1-1.9B", name: "LTX Video 1.9B" },
+                        { id: "cogvideox_5B", name: "CogVideoX 1.5" },
+                    ],
+                    suffix: "228"
+                },
+                prompt4: {
+                    text: "A dramatic skydiving scene in a realistic photographic style, capturing a skydiver accelerating during free fall. The skydiver, a young man with a determined expression, is mid-air with arms outstretched and legs extended. His body is in dynamic motion, creating a sense of speed and tension. The background features a vast blue sky with fluffy clouds, contrasting sharply with the intense focus on the skydiver. The camera angle is from below, looking up at the skydiver as he descends rapidly, emphasizing his powerful leap. The photo has a high-resolution, sharp texture, highlighting every detail of his athletic form and the rush of air around him. A medium shot with a slight downward angle.",
+                    models: [
+                        { id: "helios", name: "Helios" },
+                        { id: "sana-video", name: "SANA Video" },
+                        { id: "wan2.2_14B", name: "Wan 2.2 14B" },
+                        { id: "wan2.1_14B", name: "Wan 2.1 14B" },
+                        { id: "wan2.2_5B", name: "Wan 2.2 5B" },
+                        { id: "wan2.1_1.3B", name: "Wan 2.1 1.3B" },
+                        { id: "hv-video-v2", name: "HV Video 1.5" },
+                        { id: "hv-video-v1", name: "HV Video" },
+                        { id: "mochi", name: "Mochi-1" },
+                    ],
+                    suffix: "64"
+                },
+            };
+
+            function renderShort(promptKey, btn) {
+                const data = promptData_Short[promptKey];
+                if (!data) return;
+                if (btn) {
+                    const btns = btn.parentNode.querySelectorAll('.task-btn');
+                    btns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                }
+                document.getElementById("short-header").innerHTML = `<div class="prompt-box">${data.text}</div>`;
+                const container = document.getElementById("short-video-container");
+                container.innerHTML = "";
+                data.models.forEach(model => {
+                    const videoPath = `./videos/short_video_comparison/${model.id}_${data.suffix}.mp4`;
+                    container.innerHTML += `
+                    <div class="video-item">
+                        <div class="loading-placeholder"><div class="loading-text">Loading ...</div></div>
+                        <div class="video-title">${model.name}</div>
+                        
+                        <video autoplay muted playsinline loop class="lazy-video"
+                            onloadeddata="this.parentElement.querySelector('.loading-placeholder').style.display='none'">
+                            <source src="${videoPath}" type="video/mp4">
+                        </video>
+                    </div>`;
+                });
+            }
+            renderShort("prompt1"); // 初始化
+        </script>
+
+
+        <!-- ========================================================== -->
+        <!--  NEW SECTION: 5 T2V Showcases 720                          -->
+        <!-- ========================================================== -->
+        <section id="video-showcase-t2v-short" style="margin-top:80px;">
+            <h3 style="text-align:center; font-size:2rem; color:white; margin-bottom:20px;">
+                <strong><span class="gradient">Text-to-Video Showcases (725 Frames)</span></strong>
+            </h3>
+            <div class="video-wrapper">
+                <div class="video-grid" style="grid-template-columns: repeat(3, 1fr);">
+
+                    <div class="video-item">
+                        <div class="video-title">Showcase 1</div>
+                        <div class="prompt-wrap" style="position: relative; overflow: hidden;">
+                            <div class="loading-placeholder">
+                                <div class="loading-text">Loading ...</div>
+                            </div>
+                            <video autoplay playsinline muted loop class="lazy-video" style="width:100%; display:block;"
+                                onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';"
+                                data-src="videos/text_to_video_short_showcases/16_720_ori725.mp4">
+                            </video>
+                            <div class="prompt">A rotating camera view inside a large New York museum gallery,
+                                showcasing a towering stack of vintage televisions, each displaying different programs
+                                from the 1950s and 1970s. The televisions show a mix of 1950s sci-fi movies, horror
+                                films, news broadcasts, static, and a 1970s sitcom. The gallery space is filled with the
+                                nostalgic glow of the old TV screens, their edges worn and frames aged. The background
+                                features other vintage exhibits and artifacts, adding to the historical ambiance. The
+                                televisions are arranged in a dynamic, almost chaotic pattern, creating a sense of
+                                visual interest and movement. A wide-angle shot capturing the entire stack and the
+                                surrounding gallery space.</div>
+                        </div>
+                    </div>
+                    <div class="video-item">
+                        <div class="video-title">Showcase 2</div>
+                        <div class="prompt-wrap" style="position: relative; overflow: hidden;">
+                            <div class="loading-placeholder">
+                                <div class="loading-text">Loading ...</div>
+                            </div>
+                            <video autoplay playsinline muted loop class="lazy-video" style="width:100%; display:block;"
+                                onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';"
+                                data-src="videos/text_to_video_short_showcases/17_720_ori725.mp4">
+                            </video>
+                            <div class="prompt">A 3D animation of a small, round, fluffy creature with big, expressive
+                                eyes exploring a vibrant, enchanted forest. The creature, a whimsical blend of a rabbit
+                                and a squirrel, has soft blue fur and a bushy, striped tail. It hops along a sparkling
+                                stream, its eyes wide with wonder. The forest is alive with magical elements: flowers
+                                that glow and change colors, trees with leaves in shades of purple and silver, and small
+                                floating lights that resemble fireflies. The creature stops to interact playfully with a
+                                group of tiny, fairy-like beings dancing around a mushroom ring. The creature looks up
+                                in awe at a large, glowing tree that seems to be the heart of the forest. The scene is
+                                rendered in a detailed, fantasy style, with a soft, ethereal lighting that enhances the
+                                enchantment. The camera follows the creature as it moves, capturing its playful
+                                interactions and the magical ambiance of the forest. A medium shot with a dynamic angle
+                                that highlights the creature's expressions and the enchanting environment.</div>
+                        </div>
+                    </div>
+                    <div class="video-item">
+                        <div class="video-title">Showcase 3</div>
+                        <div class="prompt-wrap" style="position: relative; overflow: hidden;">
+                            <div class="loading-placeholder">
+                                <div class="loading-text">Loading ...</div>
+                            </div>
+                            <video autoplay playsinline muted loop class="lazy-video" style="width:100%; display:block;"
+                                onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';"
+                                data-src="videos/text_to_video_short_showcases/19_720_ori725.mp4">
+                            </video>
+                            <div class="prompt">A detailed digital painting in the style of a realistic Japanese manga,
+                                capturing reflections in the window of a train traveling through the Tokyo suburbs. The
+                                train moves smoothly, passing through lush green fields and dense forests. Outside the
+                                window, the scenery blurs into a series of vivid colors—emerald greens, deep browns, and
+                                vibrant yellows. Inside the train, a young woman with long black hair and traditional
+                                Japanese clothing sits with a contemplative expression, gazing out the window. Her
+                                kimono is adorned with intricate patterns, and she wears a simple obi sash tied neatly.
+                                The train cabin is dimly lit, with soft shadows playing across the wooden seats. The
+                                background features a blurred yet recognizable landscape, with hints of Tokyo
+                                skyscrapers and cherry blossoms in the distance. A medium shot from a slightly tilted
+                                angle, emphasizing the reflection and the woman's serene expression.</div>
+                        </div>
+                    </div>
+
+                    <div class="video-item">
+                        <div class="video-title">Showcase 12</div>
+                        <div class="prompt-wrap" style="position: relative; overflow: hidden;">
+                            <div class="loading-placeholder">
+                                <div class="loading-text">Loading ...</div>
+                            </div>
+                            <video autoplay playsinline muted loop class="lazy-video" style="width:100%; display:block;"
+                                onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';"
+                                data-src="videos/text_to_video_short_showcases/120_720_ori725.mp4">
+                            </video>
+                            <div class="prompt">A side profile shot of a woman with a dramatic backdrop of fireworks
+                                exploding in the distance. The woman has long flowing hair cascading down her back, and
+                                she gazes intently into the distance, her expression filled with a mix of wonder and
+                                excitement. She wears a elegant red dress with intricate lace detailing and a fitted
+                                bodice. The fireworks create a vibrant display of colors and light, casting a magical
+                                glow on her face. The background is blurred, capturing the burst of colors and smoke
+                                from the explosions. The photo has a dynamic and celebratory atmosphere. A medium shot
+                                with a slight tilt to the camera angle.</div>
+                        </div>
+                    </div>
+                    <div class="video-item">
+                        <div class="video-title">Showcase 6</div>
+                        <div class="prompt-wrap" style="position: relative; overflow: hidden;">
+                            <div class="loading-placeholder">
+                                <div class="loading-text">Loading ...</div>
+                            </div>
+                            <video autoplay playsinline muted loop class="lazy-video" style="width:100%; display:block;"
+                                onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';"
+                                data-src="videos/text_to_video_short_showcases/32_720_ori725.mp4">
+                            </video>
+                            <div class="prompt">A surreal and dreamlike scene in the style of a cyberpunk film,
+                                depicting New York City submerged underwater, resembling the mythical city of Atlantis.
+                                Fish, whales, sea turtles, and sharks swim through the bustling streets, which now
+                                resemble underwater landscapes. The buildings are partially submerged, their facades
+                                covered in algae and marine growth. The water is murky and filled with sunlight
+                                filtering through from above, casting colorful hues. Pedestrians, now merfolk, move
+                                gracefully through the water, interacting with the aquatic creatures. The camera angle
+                                is from a low, sweeping shot, capturing the vast expanse of this submerged metropolis.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="video-item">
+                        <div class="video-title">Showcase 5</div>
+                        <div class="prompt-wrap" style="position: relative; overflow: hidden;">
+                            <div class="loading-placeholder">
+                                <div class="loading-text">Loading ...</div>
+                            </div>
+                            <video autoplay playsinline muted loop class="lazy-video" style="width:100%; display:block;"
+                                onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';"
+                                data-src="videos/text_to_video_short_showcases/29_720_ori725.mp4">
+                            </video>
+                            <div class="prompt">A cyberpunk-style illustration depicting a lone robot navigating a
+                                neon-lit cityscape. The robot stands tall with sleek, metallic armor, adorned with
+                                blinking lights and wires. Its eyes, glowing with a deep blue hue, scan the surroundings
+                                with curiosity. The background features towering skyscrapers, holographic
+                                advertisements, and crowded streets filled with various cyborgs and humans. The air is
+                                thick with smoke and the hum of technology. A medium shot from a high-angle perspective,
+                                capturing both the robot and the bustling city environment.</div>
+                        </div>
+                    </div>
+
+                    <div class="video-item">
+                        <div class="video-title">Showcase 10</div>
+                        <div class="prompt-wrap" style="position: relative; overflow: hidden;">
+                            <div class="loading-placeholder">
+                                <div class="loading-text">Loading ...</div>
+                            </div>
+                            <video autoplay playsinline muted loop class="lazy-video" style="width:100%; display:block;"
+                                onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';"
+                                data-src="videos/text_to_video_short_showcases/61_720_ori725.mp4">
+                            </video>
+                            <div class="prompt">An astronaut runs smoothly and appears almost weightless on the lunar
+                                surface, as seen from a low-angle shot that highlights the vast, desolate background of
+                                the moon. The moon's craters and rocky terrain are clearly visible, creating a stark
+                                contrast against the running astronaut who moves with graceful, fluid motions. The
+                                background features a muted, grayscale texture with subtle shadows and highlights,
+                                emphasizing the lunar landscape's rugged beauty. The astronaut wears a classic spacesuit
+                                with reflective fabric, adding to the sense of lightness and movement. A dynamic medium
+                                shot capturing the astronaut's forward momentum.</div>
+                        </div>
+                    </div>
+                    <div class="video-item">
+                        <div class="video-title">Showcase 8</div>
+                        <div class="prompt-wrap" style="position: relative; overflow: hidden;">
+                            <div class="loading-placeholder">
+                                <div class="loading-text">Loading ...</div>
+                            </div>
+                            <video autoplay playsinline muted loop class="lazy-video" style="width:100%; display:block;"
+                                onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';"
+                                data-src="videos/text_to_video_short_showcases/43_720_ori725.mp4">
+                            </video>
+                            <div class="prompt">A vibrant and lively vlog-style photo of a corgi in tropical Maui,
+                                showcasing the dog energetically filming itself on a sandy beach. The corgi stands on
+                                the shore, one paw slightly lifted, with a joyful and curious expression. It wears a
+                                colorful collar and a small backpack camera slung over its neck. The background features
+                                a lush, palm-fringed beach with clear turquoise waters and a bright blue sky. The photo
+                                has a warm, natural lighting effect, capturing the corgi from a slightly elevated angle,
+                                emphasizing its playful and adventurous spirit.</div>
+                        </div>
+                    </div>
+                    <div class="video-item">
+                        <div class="video-title">Showcase 7</div>
+                        <div class="prompt-wrap" style="position: relative; overflow: hidden;">
+                            <div class="loading-placeholder">
+                                <div class="loading-text">Loading ...</div>
+                            </div>
+                            <video autoplay playsinline muted loop class="lazy-video" style="width:100%; display:block;"
+                                onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';"
+                                data-src="videos/text_to_video_short_showcases/34_720_ori725.mp4">
+                            </video>
+                            <div class="prompt">A cinematic film shot in 35mm capturing a dynamic step-printing scene of
+                                a person running. The runner is a young man with short, tousled brown hair and
+                                determined eyes, sprinting down a city street lined with tall buildings and neon signs.
+                                His arms are pumped vigorously, and he looks focused and energetic. The background
+                                features blurred motion with the cityscape gradually fading into a soft, sepia tone. The
+                                camera follows him closely, capturing his every stride and movement. The scene has a
+                                nostalgic and vintage film texture, enhancing the dramatic intensity of the run. A
+                                close-up shot from a slightly behind-the-subject angle.</div>
+                        </div>
+                    </div>
+
+
+                    <div class="video-item">
+                        <div class="video-title">Showcase 9</div>
+                        <div class="prompt-wrap" style="position: relative; overflow: hidden;">
+                            <div class="loading-placeholder">
+                                <div class="loading-text">Loading ...</div>
+                            </div>
+                            <video autoplay playsinline muted loop class="lazy-video" style="width:100%; display:block;"
+                                onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';"
+                                data-src="videos/text_to_video_short_showcases/44_720_ori725.mp4">
+                            </video>
+                            <div class="prompt">A cinematic and grainy photograph captures a white and orange tabby cat
+                                joyfully darting through a dense garden, as if chasing something. The cat’s eyes are
+                                wide and filled with happiness as it jogs forward, scanning the branches, flowers, and
+                                leaves. The narrow path winds between the lush greenery, and the scene is captured from
+                                a ground-level angle, providing a low and intimate perspective. The image has warm tones
+                                and a subtle grainy texture, with scattered daylight filtering through the leaves and
+                                plants above, creating a warm contrast that highlights the cat’s orange fur. The shot is
+                                clear and sharp, with a shallow depth of field that focuses solely on the cat’s
+                                movements and expressions.</div>
+                        </div>
+                    </div>
+                    <div class="video-item">
+                        <div class="video-title">Showcase 11</div>
+                        <div class="prompt-wrap" style="position: relative; overflow: hidden;">
+                            <div class="loading-placeholder">
+                                <div class="loading-text">Loading ...</div>
+                            </div>
+                            <video autoplay playsinline muted loop class="lazy-video" style="width:100%; display:block;"
+                                onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';"
+                                data-src="videos/text_to_video_short_showcases/93_720_ori725.mp4">
+                            </video>
+                            <div class="prompt">A zoom-in shot focusing on the face of a young woman sitting on a bench
+                                in the middle of an empty school gym. The woman has long wavy brown hair cascading down
+                                her shoulders and soft, warm hazel eyes. She wears a simple white t-shirt and blue
+                                jeans, her hands resting gently on her knees. Her expression is serene, with a slight
+                                smile playing on her lips. The gymnasium is mostly empty, with only a few scattered
+                                bleachers and a basketball hoop in the background. The lighting is soft and natural,
+                                creating gentle shadows under her eyes and nose. The overall atmosphere is peaceful and
+                                contemplative.</div>
+                        </div>
+                    </div>
+                    <div class="video-item">
+                        <div class="video-title">Showcase 4</div>
+                        <div class="prompt-wrap" style="position: relative; overflow: hidden;">
+                            <div class="loading-placeholder">
+                                <div class="loading-text">Loading ...</div>
+                            </div>
+                            <video autoplay playsinline muted loop class="lazy-video" style="width:100%; display:block;"
+                                onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';"
+                                data-src="videos/text_to_video_short_showcases/26_720_ori725.mp4">
+                            </video>
+                            <div class="prompt">A dynamic and lively tour through an art gallery, showcasing a diverse
+                                array of beautiful works in various styles. The gallery is filled with paintings,
+                                sculptures, and installations, each piece telling its own story. One section features
+                                impressionistic landscapes with soft brushstrokes and vibrant colors, capturing serene
+                                lakes and rolling hills. Nearby, there are realistic portraits with intricate details
+                                and lifelike expressions. In another corner, abstract artworks with bold colors and
+                                geometric shapes create a sense of movement and energy. The gallery itself has a modern,
+                                open design with high ceilings and large windows allowing natural light to flood in.
+                                Visitors move gracefully through the space, pausing occasionally to admire the works.
+                                The camera captures the gallery from multiple angles—wide shots of the entire room,
+                                close-ups of individual pieces, and sweeping pans to show the flow of visitors. The
+                                overall atmosphere is one of inspiration and wonder.</div>
+                        </div>
+                    </div>
+
+
+                    <div class="video-item">
+                        <div class="video-title">Showcase 13</div>
+                        <div class="prompt-wrap" style="position: relative; overflow: hidden;">
+                            <div class="loading-placeholder">
+                                <div class="loading-text">Loading ...</div>
+                            </div>
+                            <video autoplay playsinline muted loop class="lazy-video" style="width:100%; display:block;"
+                                onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';"
+                                data-src="videos/text_to_video_short_showcases/518_720_ori725.mp4">
+                            </video>
+                            <div class="prompt">A serene lakeside cabin in a tranquil countryside setting, with a wooden
+                                dock extending into the calm waters and a small rowboat gently floating nearby. The
+                                cabin has a rustic wooden exterior, with a red roof and large windows overlooking the
+                                lake. The surrounding area features dense greenery, with tall trees and wildflowers. The
+                                photo has a warm, natural light and a soft focus on the distant landscape, creating a
+                                peaceful and inviting atmosphere. A medium shot from a slightly elevated angle,
+                                capturing both the cabin and the dock.</div>
+                        </div>
+                    </div>
+                    <div class="video-item">
+                        <div class="video-title">Showcase 14</div>
+                        <div class="prompt-wrap" style="position: relative; overflow: hidden;">
+                            <div class="loading-placeholder">
+                                <div class="loading-text">Loading ...</div>
+                            </div>
+                            <video autoplay playsinline muted loop class="lazy-video" style="width:100%; display:block;"
+                                onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';"
+                                data-src="videos/text_to_video_short_showcases/597_720_ori725.mp4">
+                            </video>
+                            <div class="prompt">An underwater photograph in a clear and tranquil lake, capturing a
+                                person playing a grand piano. The water is crystal clear, allowing visibility to the
+                                bottom where aquatic plants and rocks create a natural, serene backdrop. The person,
+                                likely wearing a diving suit, has a focused and serene expression as they play the
+                                piano, their fingers gracefully moving over the keys. The piano itself appears old but
+                                well-maintained, with a rich wooden finish. The camera angle is slightly above the
+                                person, providing a clear view of both the pianist and the beautiful underwater scenery.
+                                The photo has a soft, almost dreamlike quality, emphasizing the harmony between the
+                                human and nature. A medium shot from a slightly elevated angle.</div>
+                        </div>
+                    </div>
+                    <div class="video-item">
+                        <div class="video-title">Showcase 15</div>
+                        <div class="prompt-wrap" style="position: relative; overflow: hidden;">
+                            <div class="loading-placeholder">
+                                <div class="loading-text">Loading ...</div>
+                            </div>
+                            <video autoplay playsinline muted loop class="lazy-video" style="width:100%; display:block;"
+                                onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';"
+                                data-src="videos/text_to_video_short_showcases/852_720_ori725.mp4">
+                            </video>
+                            <div class="prompt">A slow-motion tracking shot of a majestic horse galloping through a
+                                sun-dappled meadow. The horse's muscles ripple with each powerful stride, its mane
+                                flowing gracefully behind it as it moves with fluid elegance. The camera follows
+                                closely, emphasizing the natural motion and beauty of its gallop. The background
+                                features a lush green landscape with wildflowers blooming in patches and tall grass
+                                swaying gently in the breeze. A soft golden light filters through the trees, casting
+                                dappled shadows on the ground. The shot captures the horse's determined expression and
+                                the joyful freedom of its movement.</div>
+                        </div>
+                    </div>
+
+                    <div class="video-item">
+                        <div class="video-title">Showcase 16</div>
+                        <div class="prompt-wrap" style="position: relative; overflow: hidden;">
+                            <div class="loading-placeholder">
+                                <div class="loading-text">Loading ...</div>
+                            </div>
+                            <video autoplay playsinline muted loop class="lazy-video" style="width:100%; display:block;"
+                                onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';"
+                                data-src="videos/text_to_video_short_showcases/961_720_ori725.mp4">
+                            </video>
+                            <div class="prompt">An adorable kangaroo wearing purple overalls and cowboy boots takes a
+                                pleasant stroll through the bustling streets of Mumbai, India, during a winter storm.
+                                The kangaroo's fur is soft and fluffy, with large, expressive eyes and a playful smile.
+                                It hops along confidently, its overalls and boots adding a touch of whimsy to the scene.
+                                The background features a mix of colorful Indian street vendors, rickshaws, and tall
+                                buildings, with the storm clouds casting dramatic shadows. The storm is fierce yet
+                                beautiful, with heavy rain and strong winds, creating a dynamic and enchanting
+                                atmosphere. The kangaroo pauses occasionally to inspect its surroundings, adding a sense
+                                of curiosity and wonder. A mid-shot with a slightly elevated camera angle, capturing
+                                both the kangaroo and the vibrant cityscape.</div>
+                        </div>
+                    </div>
+                    <div class="video-item">
+                        <div class="video-title">Showcase 17</div>
+                        <div class="prompt-wrap" style="position: relative; overflow: hidden;">
+                            <div class="loading-placeholder">
+                                <div class="loading-text">Loading ...</div>
+                            </div>
+                            <video autoplay playsinline muted loop class="lazy-video" style="width:100%; display:block;"
+                                onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';"
+                                data-src="videos/text_to_video_short_showcases/820_720_ori725.mp4">
+                            </video>
+                            <div class="prompt">A dramatic close-up shot from a downward angle, starting from the lush
+                                green branches of a towering ancient tree and gradually revealing the massive, gnarled
+                                roots below. The branches are adorned with vibrant leaves, while the roots stretch out
+                                in intricate patterns, covered in moss and fungi. The background shows a dense forest
+                                floor with patches of sunlight filtering through the canopy, creating a sense of depth
+                                and mystery. The photo has a naturalistic and realistic style, emphasizing the organic
+                                textures and details of the tree and its surroundings.</div>
+                        </div>
+                    </div>
+                    <div class="video-item">
+                        <div class="video-title">Showcase 18</div>
+                        <div class="prompt-wrap" style="position: relative; overflow: hidden;">
+                            <div class="loading-placeholder">
+                                <div class="loading-text">Loading ...</div>
+                            </div>
+                            <video autoplay playsinline muted loop class="lazy-video" style="width:100%; display:block;"
+                                onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';"
+                                data-src="videos/text_to_video_short_showcases/788_720_ori725.mp4">
+                            </video>
+                            <div class="prompt">A sweeping panoramic view pans left through a tranquil, mist-covered
+                                forest, with rays of sunlight piercing through the dense canopy and casting dappled
+                                light on the forest floor. The camera captures the serene environment, with tall
+                                evergreen trees towering overhead and their silhouettes partially obscured by the mist.
+                                Faint streams and patches of wildflowers add to the natural beauty of the scene. The
+                                background gradually fades into a soft, hazy distance, emphasizing the peacefulness of
+                                the forest. A wide-angle shot with a gentle camera movement.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================== -->
+        <!--  NEW SECTION: 5 T2V Showcases                              -->
+        <!-- ========================================================== -->
+        <section id="video-showcase-t2v" style="margin-top:80px;">
+            <h3 style="text-align:center; font-size:2rem; color:white; margin-bottom:20px;">
+                <strong><span class="gradient">Text-to-Video Showcases (1449 Frames)</span></strong>
+            </h3>
+            <div class="video-wrapper">
+                <div class="video-grid" style="grid-template-columns: repeat(3, 1fr);">
+
+                    <div class="video-item">
+                        <div class="video-title">Showcase 1</div>
+                        <div class="prompt-wrap" style="position: relative; overflow: hidden;">
+                            <div class="loading-placeholder">
+                                <div class="loading-text">Loading ...</div>
+                            </div>
+                            <video autoplay playsinline muted loop class="lazy-video" style="width:100%; display:block;"
+                                onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';"
+                                data-src="videos/text_to_video_showcases/checkpoint-10000_1.mp4">
+                            </video>
+                            <div class="prompt">A vibrant tropical fish glides gracefully through colorful ocean reefs,
+                                surrounded by swaying coral, shimmering schools of tiny fish, and beams of sunlight
+                                filtering down from the water’s surface. The scene feels alive with movement, as bubbles
+                                rise gently and the reef glows in vivid shades of blue, orange, and pink, creating a
+                                tranquil yet dynamic underwater atmosphere.</div>
+                        </div>
+                    </div>
+                    <div class="video-item">
+                        <div class="video-title">Showcase 2</div>
+                        <div class="prompt-wrap" style="position: relative; overflow: hidden;">
+                            <div class="loading-placeholder">
+                                <div class="loading-text">Loading ...</div>
+                            </div>
+                            <video autoplay playsinline muted loop class="lazy-video" style="width:100%; display:block;"
+                                onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';"
+                                data-src="videos/text_to_video_showcases/checkpoint-10000_2.mp4">
+                            </video>
+                            <div class="prompt">An extreme close-up of an gray-haired man with a beard in his 60s, he is
+                                deep in thought pondering the history of the universe as he sits at a cafe in Paris, his
+                                eyes focus on people offscreen as they walk as he sits mostly motionless, he is dressed
+                                in a wool coat suit coat with a button-down shirt , he wears a brown beret and glasses
+                                and has a very professorial appearance, and the end he offers a subtle closed-mouth
+                                smile as if he found the answer to the mystery of life, the lighting is very cinematic
+                                with the golden light and the Parisian streets and city in the background, depth of
+                                field, cinematic 35mm film.</div>
+                        </div>
+                    </div>
+                    <div class="video-item">
+                        <div class="video-title">Showcase 3</div>
+                        <div class="prompt-wrap" style="position: relative; overflow: hidden;">
+                            <div class="loading-placeholder">
+                                <div class="loading-text">Loading ...</div>
+                            </div>
+                            <video autoplay playsinline muted loop class="lazy-video" style="width:100%; display:block;"
+                                onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';"
+                                data-src="videos/text_to_video_showcases/419_1440_ori1449.mp4">
+                            </video>
+                            <div class="prompt">A sleek, modern green sports car driving down a scenic coastal road. The
+                                car has a glossy exterior with minimalistic design elements, such as smooth lines and a
+                                streamlined silhouette. The sun is setting, casting a warm golden glow over the ocean in
+                                the background. The car's headlights and taillights are illuminated, adding a touch of
+                                elegance. The camera follows the car from a distance, capturing its speed and grace as
+                                it moves along the winding road. Wide shot, maintaining a steady focus on the car
+                                throughout the scene.</div>
+                        </div>
+                    </div>
+
+                    <div class="video-item">
+                        <div class="video-title">Showcase 4</div>
+                        <div class="prompt-wrap" style="position: relative; overflow: hidden;">
+                            <div class="loading-placeholder">
+                                <div class="loading-text">Loading ...</div>
+                            </div>
+                            <video autoplay playsinline muted loop class="lazy-video" style="width:100%; display:block;"
+                                onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';"
+                                data-src="videos/text_to_video_showcases/761_1440_ori1449.mp4">
+                            </video>
+                            <div class="prompt">A first-person perspective photo in a realistic outdoor style, capturing
+                                a hiker ascending a winding mountain trail. Each step reveals more of the breathtaking
+                                landscape ahead, including dense green forests, rugged cliffs, and distant peaks
+                                shrouded in mist. The hiker is a middle-aged man in a worn backpack and sturdy hiking
+                                boots, wearing a casual yet durable olive-green jacket and khaki pants. His face is set
+                                in determination, and he leans forward slightly, muscles tense from the exertion. The
+                                camera angle is from behind him, focusing on his profile as he steps confidently upward.
+                                The background is a blend of vibrant greenery and towering mountains, with a sense of
+                                depth and motion, creating a dynamic and immersive scene.</div>
+                        </div>
+                    </div>
+                    <div class="video-item">
+                        <div class="video-title">Showcase 5</div>
+                        <div class="prompt-wrap" style="position: relative; overflow: hidden;">
+                            <div class="loading-placeholder">
+                                <div class="loading-text">Loading ...</div>
+                            </div>
+                            <video autoplay playsinline muted loop class="lazy-video" style="width:100%; display:block;"
+                                onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';"
+                                data-src="videos/text_to_video_showcases/111_1440_ori1449.mp4">
+                            </video>
+                            <div class="prompt">A close-up shot of a young woman driving a car, lost in thought as she
+                                gazes ahead. Raindrops blur the view of a green forest through the car window. She wears
+                                a sleek raincoat and sunglasses, her expression contemplative. Her hands gently grip the
+                                steering wheel, and her fingers tap rhythmically against it. The interior of the car is
+                                dimly lit, with water droplets clinging to the windshield. The blurred green forest and
+                                rain create a sense of mystery and introspection. The photo has a cinematic quality,
+                                capturing the moment just before a decision is made. A close-up shot from inside the
+                                car, focusing on the driver.</div>
+                        </div>
+                    </div>
+                    <div class="video-item">
+                        <div class="video-title">Showcase 6</div>
+                        <div class="prompt-wrap" style="position: relative; overflow: hidden;">
+                            <div class="loading-placeholder">
+                                <div class="loading-text">Loading ...</div>
+                            </div>
+                            <video autoplay playsinline muted loop class="lazy-video" style="width:100%; display:block;"
+                                onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';"
+                                data-src="videos/text_to_video_showcases/116_1440_ori1449.mp4">
+                            </video>
+                            <div class="prompt">A vibrant concert stage scene in the style of a music video, featuring a
+                                woman in the spotlight, singing passionately. She stands confidently on the stage,
+                                microphone in hand, with a captivating expression on her face. The bright light behind
+                                her creates a dramatic silhouette, casting a warm glow over her. She wears a stylish,
+                                form-fitting black dress with intricate silver embroidery, emphasizing her graceful
+                                movements. The background features a blurred stage with colorful lights and banners
+                                advertising the event. A dynamic medium shot capturing the singer from a slightly
+                                elevated angle, highlighting her performance and the dramatic lighting effects.</div>
+                        </div>
+                    </div>
+
+                    <div class="video-item">
+                        <div class="video-title">Showcase 7</div>
+                        <div class="prompt-wrap" style="position: relative; overflow: hidden;">
+                            <div class="loading-placeholder">
+                                <div class="loading-text">Loading ...</div>
+                            </div>
+                            <video autoplay playsinline muted loop class="lazy-video" style="width:100%; display:block;"
+                                onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';"
+                                data-src="videos/text_to_video_showcases/173_1440_ori1449.mp4">
+                            </video>
+                            <div class="prompt">A dynamic and chaotic scene in a dense forest during a heavy rainstorm,
+                                capturing a real girl frantically running through the foliage. Her wild hair flows
+                                behind her as she sprints, her arms flailing and her face contorted in fear and
+                                desperation. Behind her, various animals—rabbits, deer, and birds—are also running,
+                                creating a frenzied atmosphere. The girl's clothes are soaked, clinging to her body, and
+                                she is screaming and shouting as she tries to escape. The background is a blur of
+                                greenery and rain-drenched trees, with occasional glimpses of the darkening sky. A
+                                wide-angle shot from a low angle, emphasizing the urgency and chaos of the moment.</div>
+                        </div>
+                    </div>
+                    <div class="video-item">
+                        <div class="video-title">Showcase 8</div>
+                        <div class="prompt-wrap" style="position: relative; overflow: hidden;">
+                            <div class="loading-placeholder">
+                                <div class="loading-text">Loading ...</div>
+                            </div>
+                            <video autoplay playsinline muted loop class="lazy-video" style="width:100%; display:block;"
+                                onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';"
+                                data-src="videos/text_to_video_showcases/205_1440_ori1449.mp4">
+                            </video>
+                            <div class="prompt">A photograph in a soft, warm lighting style, capturing a young woman
+                                with a bright smile and a playful wink. She has long curly brown hair and warm hazel
+                                eyes, with a slightly flushed cheeks from laughter. She is dressed in a casual yet
+                                stylish outfit: a floral printed sundress with a flowy skirt and a fitted top. Her hands
+                                are on her hips, giving a casual pose. The background features a blurred outdoor garden
+                                setting with blooming flowers and greenery. A medium shot from a slightly
+                                above-the-shoulder angle, emphasizing her joyful expression and the natural movement of
+                                her face.</div>
+                        </div>
+                    </div>
+                    <div class="video-item">
+                        <div class="video-title">Showcase 9</div>
+                        <div class="prompt-wrap" style="position: relative; overflow: hidden;">
+                            <div class="loading-placeholder">
+                                <div class="loading-text">Loading ...</div>
+                            </div>
+                            <video autoplay playsinline muted loop class="lazy-video" style="width:100%; display:block;"
+                                onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';"
+                                data-src="videos/text_to_video_showcases/223_1440_ori1449.mp4">
+                            </video>
+                            <div class="prompt">A poignant moment captured in a realistic photographic style, showing a
+                                middle-aged man with a rugged face and slightly tousled hair, his chin quivering with
+                                emotion as he says a heartfelt goodbye to a loved one. He wears a simple grey sweater
+                                and jeans, standing on a dewy grassy field under a clear blue sky, with fluffy white
+                                clouds in the background. The camera angle is slightly from below, emphasizing his
+                                sorrowful expression and the depth of his feelings. A medium shot with a soft focus on
+                                the man's face and a blurred background.</div>
+                        </div>
+                    </div>
+
+                    <div class="video-item">
+                        <div class="video-title">Showcase 10</div>
+                        <div class="prompt-wrap" style="position: relative; overflow: hidden;">
+                            <div class="loading-placeholder">
+                                <div class="loading-text">Loading ...</div>
+                            </div>
+                            <video autoplay playsinline muted loop class="lazy-video" style="width:100%; display:block;"
+                                onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';"
+                                data-src="videos/text_to_video_showcases/316_1440_ori1449.mp4">
+                            </video>
+                            <div class="prompt">A vibrant anime illustration in a dynamic, thick-line painting style of
+                                a young girl blowing a kiss to the camera. She has long flowing hair that cascades down
+                                her back, framed by soft bangs that partially cover her eyes. The girl wears a colorful
+                                floral dress with ruffled sleeves and a delicate belt. She has bright, sparkling eyes
+                                and a sweet, joyful smile. Her lips are parted, and she blows a kiss towards the camera
+                                with a playful and innocent expression. The background is a blurred outdoor setting with
+                                a gentle sunset, highlighting warm hues of orange and pink. A close-up shot from a
+                                slightly tilted angle, capturing the moment of her kiss.</div>
+                        </div>
+                    </div>
+                    <div class="video-item">
+                        <div class="video-title">Showcase 11</div>
+                        <div class="prompt-wrap" style="position: relative; overflow: hidden;">
+                            <div class="loading-placeholder">
+                                <div class="loading-text">Loading ...</div>
+                            </div>
+                            <video autoplay playsinline muted loop class="lazy-video" style="width:100%; display:block;"
+                                onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';"
+                                data-src="videos/text_to_video_showcases/694_1440_ori1449.mp4">
+                            </video>
+                            <div class="prompt">A vibrant display of fireworks lighting up the night sky. The fireworks
+                                burst into colorful explosions of red, blue, green, and gold, creating intricate
+                                patterns against a dark, starry backdrop. Each explosion is followed by trails of light
+                                that slowly fade away. The ground is seen below, with people watching in awe, their
+                                faces illuminated momentarily by the bright flashes. The scene captures the excitement
+                                and joy of a festive celebration. Wide shot, capturing the expansive sky and the crowd
+                                below.</div>
+                        </div>
+                    </div>
+                    <div class="video-item">
+                        <div class="video-title">Showcase 12</div>
+                        <div class="prompt-wrap" style="position: relative; overflow: hidden;">
+                            <div class="loading-placeholder">
+                                <div class="loading-text">Loading ...</div>
+                            </div>
+                            <video autoplay playsinline muted loop class="lazy-video" style="width:100%; display:block;"
+                                onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';"
+                                data-src="videos/text_to_video_showcases/16_1440_ori1449.mp4">
+                            </video>
+                            <div class="prompt">A smooth, continuous panning shot over a scenic countryside landscape,
+                                showcasing rolling green hills, vibrant wildflowers, and winding rural roads. The camera
+                                pans slowly from left to right, capturing the serene beauty of the environment as the
+                                sun sets in the distance, casting a warm golden glow across the scene. The duration of
+                                this panning shot should be extended to 4 seconds to fully appreciate the detailed
+                                scenery and the changing light conditions. Wide shot.</div>
+                        </div>
+                    </div>
+
+
+                    <div class="video-item">
+                        <div class="video-title">Showcase 13</div>
+                        <div class="prompt-wrap" style="position: relative; overflow: hidden;">
+                            <div class="loading-placeholder">
+                                <div class="loading-text">Loading ...</div>
+                            </div>
+                            <video autoplay playsinline muted loop class="lazy-video" style="width:100%; display:block;"
+                                onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';"
+                                data-src="videos/text_to_video_showcases/624_1440_ori1449.mp4">
+                            </video>
+                            <div class="prompt">A happy and playful Corgi running and frolicking in a sunlit park during
+                                the golden hour of sunset. The Corgi has a joyful expression, wagging its tail and
+                                chasing after a small ball. The park is lush with green grass and vibrant flowers,
+                                creating a serene and picturesque backdrop. The sunlight filters through the trees,
+                                casting a warm glow over the scene. The video is captured in super slow motion,
+                                emphasizing the fluidity of the dog's movements and the beauty of the surroundings. Wide
+                                shot, capturing the expansive park landscape.</div>
+                        </div>
+                    </div>
+                    <div class="video-item">
+                        <div class="video-title">Showcase 14</div>
+                        <div class="prompt-wrap" style="position: relative; overflow: hidden;">
+                            <div class="loading-placeholder">
+                                <div class="loading-text">Loading ...</div>
+                            </div>
+                            <video autoplay playsinline muted loop class="lazy-video" style="width:100%; display:block;"
+                                onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';"
+                                data-src="videos/text_to_video_showcases/73_1440_ori1449.mp4">
+                            </video>
+                            <div class="prompt">A Viking warrior driving a modern city bus filled with passengers. The
+                                Viking has long blonde hair tied back, a beard, and is adorned with a fur-lined helmet
+                                and armor. He wears a traditional tunic and trousers, but also sports a seatbelt as he
+                                focuses on navigating the busy streets. The interior of the bus is typical, with rows of
+                                seats occupied by diverse passengers going about their daily routines. The exterior
+                                shots show the bustling urban environment, including tall buildings and traffic. Medium
+                                shot focusing on the Viking at the wheel, with occasional close-ups of his determined
+                                expression.</div>
+                        </div>
+                    </div>
+                    <div class="video-item">
+                        <div class="video-title">Showcase 15</div>
+                        <div class="prompt-wrap" style="position: relative; overflow: hidden;">
+                            <div class="loading-placeholder">
+                                <div class="loading-text">Loading ...</div>
+                            </div>
+                            <video autoplay playsinline muted loop class="lazy-video" style="width:100%; display:block;"
+                                onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';"
+                                data-src="videos/text_to_video_showcases/89_1440_ori1449.mp4">
+                            </video>
+                            <div class="prompt">A lone gray wolf with piercing yellow eyes walking gracefully through a
+                                dense jungle. The wolf's fur is thick and shaggy, with a slight sheen from the morning
+                                dew. It moves silently, tail slightly raised, sniffing the air with each step. The
+                                jungle surrounds it with towering trees and lush greenery, creating a vibrant and
+                                immersive environment. The ground beneath the wolf is covered in fallen leaves and moss.
+                                The scene captures the wolf in a mid-shot, emphasizing its interaction with the natural
+                                surroundings.</div>
+                        </div>
+                    </div>
+
+                    <div class="video-item">
+                        <div class="video-title">Showcase 16</div>
+                        <div class="prompt-wrap" style="position: relative; overflow: hidden;">
+                            <div class="loading-placeholder">
+                                <div class="loading-text">Loading ...</div>
+                            </div>
+                            <video autoplay playsinline muted loop class="lazy-video" style="width:100%; display:block;"
+                                onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';"
+                                data-src="videos/text_to_video_showcases/251_1440_ori1449.mp4">
+                            </video>
+                            <div class="prompt">A documentary-style nature photography shot from a camera truck moving
+                                to the left, capturing a crab quickly scurrying into its burrow. The crab has a hard,
+                                greenish-brown shell and long claws, moving with determined speed across the sandy
+                                ground. Its body is slightly arched as it burrows into the sand, leaving a small trail
+                                behind. The background shows a shallow beach with scattered rocks and seashells, and the
+                                horizon features a gentle curve of the coastline. The photo has a natural and realistic
+                                texture, emphasizing the crab's natural movement and the texture of the sand. A close-up
+                                shot from a slightly elevated angle.</div>
+                        </div>
+                    </div>
+                    <div class="video-item">
+                        <div class="video-title">Showcase 17</div>
+                        <div class="prompt-wrap" style="position: relative; overflow: hidden;">
+                            <div class="loading-placeholder">
+                                <div class="loading-text">Loading ...</div>
+                            </div>
+                            <video autoplay playsinline muted loop class="lazy-video" style="width:100%; display:block;"
+                                onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';"
+                                data-src="videos/text_to_video_showcases/303_1440_ori1449.mp4">
+                            </video>
+                            <div class="prompt">A calm and serene outdoor scene featuring a happy golden retriever
+                                walking leisurely on a grassy path. The dog has a playful expression, wagging its tail
+                                and sniffing the air curiously. It is on a leash held gently by an unseen owner. The
+                                background showcases a lush green landscape with tall trees and a clear blue sky. The
+                                camera follows the dog from a medium distance, capturing the peaceful atmosphere of the
+                                walk. The scene is static, emphasizing the tranquil nature of the stroll.</div>
+                        </div>
+                    </div>
+                    <div class="video-item">
+                        <div class="video-title">Showcase 18</div>
+                        <div class="prompt-wrap" style="position: relative; overflow: hidden;">
+                            <div class="loading-placeholder">
+                                <div class="loading-text">Loading ...</div>
+                            </div>
+                            <video autoplay playsinline muted loop class="lazy-video" style="width:100%; display:block;"
+                                onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';"
+                                data-src="videos/text_to_video_showcases/114_1440_ori1449.mp4">
+                            </video>
+                            <div class="prompt">Real-life aerial footage of an eagle in flight over a vast, open
+                                landscape. The eagle has a sleek brown body with sharp talons and a prominent white
+                                head. It soars gracefully through the sky, wings spread wide as it glides effortlessly.
+                                The eagle occasionally flaps its powerful wings, creating a fluid motion against the
+                                backdrop of rolling hills and clear blue skies. Focus on close-up shots of the eagle’s
+                                majestic face and detailed feathers, transitioning to wide-angle views showcasing the
+                                eagle's flight path across the expansive terrain. Static shots with no camera movement,
+                                emphasizing the natural beauty and freedom of the eagle’s flight.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================== -->
+        <!--  NEW SECTION: 6 I2V Showcases                              -->
+        <!-- ========================================================== -->
+        <section id="video-showcase-i2v" style="margin-top:80px;">
+            <h3 style="text-align:center; font-size:2rem; color:white; margin-bottom:20px;">
+                <strong><span class="gradient">Image-to-Video Showcases (1449 Frames)</span></strong>
+            </h3>
+
+            <div class="video-wrapper">
+                <div class="video-grid" style="grid-template-columns: repeat(3, 1fr);">
+
+                    <div class="video-item">
+                        <div class="video-title">Showcase 1</div>
+                        <div class="prompt-wrap" style="position: relative; overflow: hidden;">
+                            <div class="loading-placeholder">
+                                <div class="loading-text">Loading ...</div>
+                            </div>
+                            <video autoplay playsinline muted loop class="lazy-video" style="width:100%; display:block;"
+                                onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';"
+                                data-src="videos/image_to_video_showcases/33_1440_ori1449.mp4">
+                            </video>
+                            <div class="prompt">A sweeping view captures the heart of a bustling metropolis at dusk,
+                                where streams of headlights illuminate a busy highway snaking along the waterfront. The
+                                iconic silhouette of the Brooklyn Bridge stretches across the river, connecting the
+                                vibrant cityscape with its towering skyscrapers rising against a dramatic, rose-tinted
+                                sky. Boats glide quietly on the shimmering water below, while the city pulses with life
+                                and energy. The blend of architectural grandeur and constant motion paints a vivid
+                                portrait of urban dynamism, as the fading sunlight casts a warm glow over the skyline
+                                and the relentless flow of traffic. This scene encapsulates the essence of city
+                                life—restless, luminous, and ever-evolving.</div>
+                        </div>
+                    </div>
+                    <div class="video-item">
+                        <div class="video-title">Showcase 2</div>
+                        <div class="prompt-wrap" style="position: relative; overflow: hidden;">
+                            <div class="loading-placeholder">
+                                <div class="loading-text">Loading ...</div>
+                            </div>
+                            <video autoplay playsinline muted loop class="lazy-video" style="width:100%; display:block;"
+                                onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';"
+                                data-src="videos/image_to_video_showcases/23.mp4">
+                            </video>
+                            <div class="prompt">A close-up shot captures three brightly colored canaries perched on a
+                                wooden branch. Each bird displays vibrant feathers in shades of yellow, orange, and
+                                green, creating a striking contrast against the soft, blurred background. The canary on
+                                the left has a predominantly yellow body with a black patch on its head, the one in the
+                                middle is a vivid orange, and the one on the right combines green and yellow hues. Their
+                                small, sharp beaks and perky postures add to their lively appearance. The wooden branch
+                                they sit on is simple and rustic, enhancing the natural beauty of the scene. The
+                                background is softly out of focus, drawing attention to the birds' vivid colors and
+                                intricate feather patterns. A close-up shot from a slightly elevated perspective.</div>
+                        </div>
+                    </div>
+                    <div class="video-item">
+                        <div class="video-title">Showcase 3</div>
+                        <div class="prompt-wrap" style="position: relative; overflow: hidden;">
+                            <div class="loading-placeholder">
+                                <div class="loading-text">Loading ...</div>
+                            </div>
+                            <video autoplay playsinline muted loop class="lazy-video" style="width:100%; display:block;"
+                                onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';"
+                                data-src="videos/image_to_video_showcases/11.mp4">
+                            </video>
+                            <div class="prompt">A high-resolution photograph captures an Airbus A380 in flight against a
+                                clear sky, emphasizing its sleek design and iconic blue and white livery. The aircraft
+                                prominently displays the slogan "Greener, Cleaner, Quieter, Smarter" along its fuselage,
+                                highlighting its eco-friendly features. The A380's large wingspan and distinctive tail
+                                fin are clearly visible, showcasing its impressive size and engineering. The image is
+                                taken from a side angle, providing a comprehensive view of the aircraft's profile as it
+                                soars gracefully through the sky. The background is a serene, unobstructed expanse of
+                                blue, enhancing the sense of freedom and modern aviation technology. A medium shot
+                                capturing the aircraft in motion.</div>
+                        </div>
+                    </div>
+
+                    <div class="video-item">
+                        <div class="video-title">Showcase 4</div>
+                        <div class="prompt-wrap" style="position: relative; overflow: hidden;">
+                            <div class="loading-placeholder">
+                                <div class="loading-text">Loading ...</div>
+                            </div>
+                            <video autoplay playsinline muted loop class="lazy-video" style="width:100%; display:block;"
+                                onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';"
+                                data-src="videos/image_to_video_showcases/36_1440_ori1449.mp4">
+                            </video>
+                            <div class="prompt">Bathed in the warm glow of the setting sun, the iconic Golden Gate
+                                Bridge stretches gracefully across the bay, its vibrant orange towers casting long
+                                shadows over the shimmering water. As the view slowly pans left, the bridge’s elegant
+                                lines and sweeping cables are illuminated against a backdrop of rolling hills and soft,
+                                drifting fog. The sunlight catches every detail, highlighting the bridge’s majestic
+                                architecture and the tranquil beauty of the surrounding landscape. Wisps of mist curl
+                                around the towers, adding a touch of mystery to the scene, while the sky transitions
+                                from pale blue to gentle hues of gold and pink. The entire panorama captures the
+                                timeless allure and grandeur of San Francisco’s most famous landmark at dusk.</div>
+                        </div>
+                    </div>
+                    <div class="video-item">
+                        <div class="video-title">Showcase 5</div>
+                        <div class="prompt-wrap" style="position: relative; overflow: hidden;">
+                            <div class="loading-placeholder">
+                                <div class="loading-text">Loading ...</div>
+                            </div>
+                            <video autoplay playsinline muted loop class="lazy-video" style="width:100%; display:block;"
+                                onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';"
+                                data-src="videos/image_to_video_showcases/40_1440_ori1449.mp4">
+                            </video>
+                            <div class="prompt">A towering emerald wave surges forward, its crest curling with raw power
+                                and energy. Sunlight glints off the translucent water, illuminating the intricate
+                                textures and deep green hues within the wave’s body. A thick spray erupts from the
+                                breaking crest, casting a misty veil that dances above the churning surface. As the
+                                perspective widens, the immense scale of the wave becomes apparent, revealing the
+                                restless expanse of the ocean stretching beyond. The scene captures the ocean’s untamed
+                                beauty and relentless force, with every droplet and ripple shimmering in the light. The
+                                dynamic motion and vivid colors evoke both awe and respect for nature’s might.</div>
+                        </div>
+                    </div>
+                    <div class="video-item">
+                        <div class="video-title">Showcase 6</div>
+                        <div class="prompt-wrap" style="position: relative; overflow: hidden;">
+                            <div class="loading-placeholder">
+                                <div class="loading-text">Loading ...</div>
+                            </div>
+                            <video autoplay playsinline muted loop class="lazy-video" style="width:100%; display:block;"
+                                onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';"
+                                data-src="videos/image_to_video_showcases/42_1440_ori1449.mp4">
+                            </video>
+                            <div class="prompt">Perched dramatically atop a sheer cliff, the iconic Tiger’s Nest
+                                Monastery in Bhutan clings to the rugged mountainside, its white walls and golden roofs
+                                gleaming against the backdrop of dense emerald forests. As the view expands, the
+                                breathtaking scale of the landscape is revealed—steep rock faces plunge into deep
+                                valleys, while pine-covered hills stretch into the misty distance. The monastery,
+                                seemingly suspended between earth and sky, radiates an aura of serenity and spiritual
+                                majesty. Winding stone paths and stairways snake up the mountainside, hinting at the
+                                pilgrimage required to reach this sacred sanctuary. The harmony between the ancient
+                                architecture and the untamed natural beauty of the Himalayas creates a sense of awe and
+                                wonder, capturing the mystical allure of Bhutan’s most revered landmark.</div>
+                        </div>
+                    </div>
+
+                    <div class="video-item">
+                        <div class="video-title">Showcase 7</div>
+                        <div class="prompt-wrap" style="position: relative; overflow: hidden;">
+                            <div class="loading-placeholder">
+                                <div class="loading-text">Loading ...</div>
+                            </div>
+                            <video autoplay playsinline muted loop class="lazy-video" style="width:100%; display:block;"
+                                onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';"
+                                data-src="videos/image_to_video_showcases/106.mp4">
+                            </video>
+                            <div class="prompt">A bright yellow Lamborghini Huracn Tecnica speeds along a curving
+                                mountain road, surrounded by lush green trees under a partly cloudy sky. The car's sleek
+                                design and vibrant color stand out against the natural backdrop, emphasizing its dynamic
+                                movement. The road curves gently, with a guardrail visible on one side, adding depth to
+                                the scene. The motion blur captures the sense of speed and energy, creating a thrilling
+                                and exhilarating atmosphere. A front-facing shot from a slightly elevated angle,
+                                highlighting the car's aggressive stance and the surrounding greenery.</div>
+                        </div>
+                    </div>
+                    <div class="video-item">
+                        <div class="video-title">Showcase 8</div>
+                        <div class="prompt-wrap" style="position: relative; overflow: hidden;">
+                            <div class="loading-placeholder">
+                                <div class="loading-text">Loading ...</div>
+                            </div>
+                            <video autoplay playsinline muted loop class="lazy-video" style="width:100%; display:block;"
+                                onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';"
+                                data-src="videos/image_to_video_showcases/70_1440_ori1449.mp4">
+                            </video>
+                            <div class="prompt">Tower Bridge stands majestically over the River Thames, its iconic twin
+                                towers illuminated against the evening skyline. The city lights shimmer on the water as
+                                boats glide beneath the bridge’s elegant suspension cables. As the view sweeps left, the
+                                bustling riverside comes into focus, revealing a vibrant mix of historic architecture
+                                and modern glass-fronted buildings. The distinctive rounded shape of City Hall sits in
+                                the foreground, while the intricate network of streets and glowing windows stretches
+                                into the distance. The scene captures the dynamic energy of London at dusk, blending the
+                                timeless grandeur of Tower Bridge with the lively urban landscape that surrounds it.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="video-item">
+                        <div class="video-title">Showcase 9</div>
+                        <div class="prompt-wrap" style="position: relative; overflow: hidden;">
+                            <div class="loading-placeholder">
+                                <div class="loading-text">Loading ...</div>
+                            </div>
+                            <video autoplay playsinline muted loop class="lazy-video" style="width:100%; display:block;"
+                                onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';"
+                                data-src="videos/image_to_video_showcases/74_1440_ori1449.mp4">
+                            </video>
+                            <div class="prompt">A sweeping aerial perspective reveals a striking, futuristic structure
+                                perched dramatically on a cliff’s edge, its bold, saucer-like form jutting out over
+                                shimmering waters. A vibrant, winding walkway leads visitors toward the building,
+                                guiding them along the cliffside and inviting exploration. The scene is alive with
+                                people strolling, gathering, and admiring the breathtaking panorama. As the view tilts
+                                upward, the vast expanse of water stretches toward distant, rugged mountains, bathed in
+                                soft, golden light. The harmonious blend of innovative architecture and natural beauty
+                                creates a sense of awe and wonder, capturing the spirit of modern design seamlessly
+                                integrated with the serene coastal landscape.</div>
+                        </div>
+                    </div>
+
+                    <div class="video-item">
+                        <div class="video-title">Showcase 12</div>
+                        <div class="prompt-wrap" style="position: relative; overflow: hidden;">
+                            <div class="loading-placeholder">
+                                <div class="loading-text">Loading ...</div>
+                            </div>
+                            <video autoplay playsinline muted loop class="lazy-video" style="width:100%; display:block;"
+                                onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';"
+                                data-src="videos/image_to_video_showcases/122.mp4">
+                            </video>
+                            <div class="prompt">A close-up captures a fluffy orange cat with striking green eyes and
+                                white whiskers, gazing intently towards the camera. The cat's fur is soft and
+                                well-groomed, with a mix of warm orange and cream tones. Its large, expressive eyes are
+                                a vivid green, reflecting curiosity and alertness. The cat's nose is small and pink, and
+                                its mouth is slightly open, revealing a hint of its pink tongue. The background is
+                                softly blurred, suggesting a cozy indoor setting with neutral tones. The photo has a
+                                shallow depth of field, focusing sharply on the cat's face while the background remains
+                                out of focus. A close-up shot from a slightly elevated perspective.</div>
+                        </div>
+                    </div>
+                    <div class="video-item">
+                        <div class="video-title">Showcase 11</div>
+                        <div class="prompt-wrap" style="position: relative; overflow: hidden;">
+                            <div class="loading-placeholder">
+                                <div class="loading-text">Loading ...</div>
+                            </div>
+                            <video autoplay playsinline muted loop class="lazy-video" style="width:100%; display:block;"
+                                onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';"
+                                data-src="videos/image_to_video_showcases/112_1440_ori1449.mp4">
+                            </video>
+                            <div class="prompt">Towering flames roar into the night, casting a golden glow across the
+                                darkness. Sparks swirl upward, dancing on the cool evening air as thick logs crackle and
+                                collapse into embers. The camera glides left, revealing the bonfire’s full intensity—its
+                                heat palpable even from a distance. Shadows flicker and shift, illuminated by the fire’s
+                                fierce energy, while the surrounding night remains deep and mysterious. The bonfire’s
+                                radiant light draws attention to the swirling smoke and the mesmerizing patterns of
+                                flying embers, creating a dramatic and captivating scene that embodies both warmth and
+                                wildness.</div>
+                        </div>
+                    </div>
+                    <div class="video-item">
+                        <div class="video-title">Showcase 10</div>
+                        <div class="prompt-wrap" style="position: relative; overflow: hidden;">
+                            <div class="loading-placeholder">
+                                <div class="loading-text">Loading ...</div>
+                            </div>
+                            <video autoplay playsinline muted loop class="lazy-video" style="width:100%; display:block;"
+                                onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';"
+                                data-src="videos/image_to_video_showcases/107.mp4">
+                            </video>
+                            <div class="prompt">A sleek red Kia car speeds along a rural road under a cloudy sky, its
+                                modern design and dynamic movement emphasized by the blurred motion of the surrounding
+                                fields and trees stretching into the distance. The car's glossy exterior reflects the
+                                overcast sky, highlighting its aerodynamic shape and sporty stance. The license plate
+                                reads "KIA 626," and the vehicle's headlights are on, adding to the sense of motion and
+                                energy. The road curves gently, with the car positioned slightly off-center, creating a
+                                sense of forward momentum. A dynamic front three-quarter view captures the car's
+                                powerful presence against the serene backdrop of rolling hills and scattered trees.
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="video-item">
+                        <div class="video-title">Showcase 13</div>
+                        <div class="prompt-wrap" style="position: relative; overflow: hidden;">
+                            <div class="loading-placeholder">
+                                <div class="loading-text">Loading ...</div>
+                            </div>
+                            <video autoplay playsinline muted loop class="lazy-video" style="width:100%; display:block;"
+                                onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';"
+                                data-src="videos/image_to_video_showcases/143_1440_ori1449.mp4">
+                            </video>
+                            <div class="prompt">Golden sunlight spills across a tranquil mountain lake, casting fiery
+                                reflections on the glassy water. Framed by lush green foliage, the scene draws the eye
+                                toward rugged rocks and a solitary tree standing sentinel at the water’s edge. Towering
+                                peaks rise in the distance, their silhouettes softened by the warm glow of dusk. As the
+                                view moves closer, delicate grasses and moss-covered stones at the shoreline come into
+                                focus, enhancing the sense of peaceful seclusion. The sky blazes with hues of orange and
+                                pink, gradually fading into the cool blues of the encroaching night, while the gentle
+                                ripples on the lake mirror the vibrant colors above. This serene alpine landscape
+                                captures the quiet majesty of nature as day gracefully gives way to night.</div>
+                        </div>
+                    </div>
+                    <div class="video-item">
+                        <div class="video-title">Showcase 14</div>
+                        <div class="prompt-wrap" style="position: relative; overflow: hidden;">
+                            <div class="loading-placeholder">
+                                <div class="loading-text">Loading ...</div>
+                            </div>
+                            <video autoplay playsinline muted loop class="lazy-video" style="width:100%; display:block;"
+                                onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';"
+                                data-src="videos/image_to_video_showcases/163_1440_ori1449.mp4">
+                            </video>
+                            <div class="prompt">A sweeping view reveals Tokyo’s dazzling skyline under the night sky,
+                                with countless skyscrapers aglow in neon and city lights. The iconic Tokyo Tower stands
+                                out, its vibrant orange illumination piercing the darkness and drawing the eye amid a
+                                sea of illuminated buildings. As the perspective gently tilts downward, the intricate
+                                urban landscape unfolds—streets bustling with life, high-rises packed tightly together,
+                                and pockets of greenery nestled among the concrete. The city pulses with energy, each
+                                window and rooftop contributing to the tapestry of light. The horizon stretches
+                                endlessly, hinting at Tokyo’s vastness and modernity, while the interplay of colors and
+                                reflections creates a mesmerizing, almost futuristic atmosphere. The scene captures the
+                                essence of Tokyo at night: dynamic, luminous, and endlessly captivating.</div>
+                        </div>
+                    </div>
+                    <div class="video-item">
+                        <div class="video-title">Showcase 15</div>
+                        <div class="prompt-wrap" style="position: relative; overflow: hidden;">
+                            <div class="loading-placeholder">
+                                <div class="loading-text">Loading ...</div>
+                            </div>
+                            <video autoplay playsinline muted loop class="lazy-video" style="width:100%; display:block;"
+                                onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';"
+                                data-src="videos/image_to_video_showcases/177_1440_ori1449.mp4">
+                            </video>
+                            <div class="prompt">A majestic hot-air balloon drifts gracefully above a sunlit desert
+                                expanse, its striped envelope glowing against the clear blue sky. As the camera zooms
+                                in, the intricate textures of the arid landscape below come into sharp focus—rugged
+                                hills, scattered rock formations, and winding trails etched into the earth. The balloon
+                                floats serenely, casting a gentle shadow over the golden terrain, while distant
+                                mountains fade into the horizon. The scene captures a sense of adventure and
+                                tranquility, highlighting the vastness and beauty of the desert from a breathtaking
+                                aerial perspective.</div>
+                        </div>
+                    </div>
+                    <div class="video-item">
+                        <div class="video-title">Showcase 16</div>
+                        <div class="prompt-wrap" style="position: relative; overflow: hidden;">
+                            <div class="loading-placeholder">
+                                <div class="loading-text">Loading ...</div>
+                            </div>
+                            <video autoplay playsinline muted loop class="lazy-video" style="width:100%; display:block;"
+                                onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';"
+                                data-src="videos/image_to_video_showcases/236.mp4">
+                            </video>
+                            <div class="prompt">A breathtaking panoramic view of Mount Everest at sunrise, capturing the
+                                majestic peaks bathed in the warm golden light of dawn. The rugged, snow-covered terrain
+                                is dramatically highlighted, casting deep shadows that accentuate the mountain's
+                                intricate textures. The sky transitions beautifully from a deep purple to a soft pink,
+                                creating a serene and awe-inspiring atmosphere. The camera angle is a wide shot,
+                                emphasizing the grandeur and scale of the mountain range.</div>
+                        </div>
+                    </div>
+                    <div class="video-item">
+                        <div class="video-title">Showcase 17</div>
+                        <div class="prompt-wrap" style="position: relative; overflow: hidden;">
+                            <div class="loading-placeholder">
+                                <div class="loading-text">Loading ...</div>
+                            </div>
+                            <video autoplay playsinline muted loop class="lazy-video" style="width:100%; display:block;"
+                                onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';"
+                                data-src="videos/image_to_video_showcases/322.mp4">
+                            </video>
+                            <div class="prompt">A sleek modern Alstom Adessia train, painted in a pristine white design
+                                adorned with vibrant green and red accents, speeds along tracks, cutting through a lush
+                                green landscape under a clear blue sky. The train's streamlined body glides
+                                effortlessly, with its front prominently displaying the "Adessia" logo and the "ALSTOM"
+                                branding. The surrounding environment is rich with verdant foliage, and distant urban
+                                buildings rise in the background, adding depth to the scene. The camera follows the
+                                train from a dynamic side angle, capturing the sense of motion and speed.</div>
+                        </div>
+                    </div>
+                    <div class="video-item">
+                        <div class="video-title">Showcase 18</div>
+                        <div class="prompt-wrap" style="position: relative; overflow: hidden;">
+                            <div class="loading-placeholder">
+                                <div class="loading-text">Loading ...</div>
+                            </div>
+                            <video autoplay playsinline muted loop class="lazy-video" style="width:100%; display:block;"
+                                onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';"
+                                data-src="videos/image_to_video_showcases/347.mp4">
+                            </video>
+                            <div class="prompt">A serene zoo enclosure features two adult giraffes and their calf
+                                standing together amidst lush greenery and scattered logs. The giraffes, with their
+                                distinctive brown patches outlined in white, appear to be interacting peacefully, their
+                                long necks reaching towards each other as if in a gentle greeting. The calf stands
+                                between them, looking up curiously. The background is filled with dense foliage and a
+                                few fallen logs, creating a naturalistic habitat. The ground is a mix of dirt and
+                                patches of grass, adding to the realistic setting. A medium shot captures the family in
+                                a relaxed and harmonious moment.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================== -->
+        <!--  NEW SECTION: 7 Interactive2V Showcases                    -->
+        <!-- ========================================================== -->
+        <section id="video-showcase-t2v" style="margin-top:80px;">
+            <h3 style="text-align:center; font-size:2rem; color:white; margin-bottom:20px;">
+                <strong><span class="gradient">Interactive-Video Showcases (1449 Frames)</span></strong>
+            </h3>
+
+            <div class="video-wrapper">
+                <div class="video-grid" style="grid-template-columns: repeat(3, 1fr);">
+
+                    <div class="video-item">
+                        <div class="video-title">Showcase 1</div>
+                        <div class="prompt-wrap" style="position: relative; overflow: hidden;">
+                            <div class="loading-placeholder">
+                                <div class="loading-text">Loading ...</div>
+                            </div>
+                            <video autoplay playsinline muted loop class="lazy-video" style="width:100%; display:block;"
+                                onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';"
+                                data-src="videos/interactive_video_showcases/6.mp4">
+                            </video>
+                            <div class="prompt">Interactive Prompt 1</div>
+                        </div>
+                    </div>
+                    <div class="video-item">
+                        <div class="video-title">Showcase 2</div>
+                        <div class="prompt-wrap" style="position: relative; overflow: hidden;">
+                            <div class="loading-placeholder">
+                                <div class="loading-text">Loading ...</div>
+                            </div>
+                            <video autoplay playsinline muted loop class="lazy-video" style="width:100%; display:block;"
+                                onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';"
+                                data-src="videos/interactive_video_showcases/8.mp4">
+                            </video>
+                            <div class="prompt">Interactive Prompt 2</div>
+                        </div>
+                    </div>
+                    <div class="video-item">
+                        <div class="video-title">Showcase 3</div>
+                        <div class="prompt-wrap" style="position: relative; overflow: hidden;">
+                            <div class="loading-placeholder">
+                                <div class="loading-text">Loading ...</div>
+                            </div>
+                            <video autoplay playsinline muted loop class="lazy-video" style="width:100%; display:block;"
+                                onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';"
+                                data-src="videos/interactive_video_showcases/11.mp4">
+                            </video>
+                            <div class="prompt">Interactive Prompt 3</div>
+                        </div>
+                    </div>
+                    <div class="video-item">
+                        <div class="video-title">Showcase 4</div>
+                        <div class="prompt-wrap" style="position: relative; overflow: hidden;">
+                            <div class="loading-placeholder">
+                                <div class="loading-text">Loading ...</div>
+                            </div>
+                            <video autoplay playsinline muted loop class="lazy-video" style="width:100%; display:block;"
+                                onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';"
+                                data-src="videos/interactive_video_showcases/14.mp4">
+                            </video>
+                            <div class="prompt">Interactive Prompt 4</div>
+                        </div>
+                    </div>
+                    <div class="video-item">
+                        <div class="video-title">Showcase 5</div>
+                        <div class="prompt-wrap" style="position: relative; overflow: hidden;">
+                            <div class="loading-placeholder">
+                                <div class="loading-text">Loading ...</div>
+                            </div>
+                            <video autoplay playsinline muted loop class="lazy-video" style="width:100%; display:block;"
+                                onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';"
+                                data-src="videos/interactive_video_showcases/20.mp4">
+                            </video>
+                            <div class="prompt">Interactive Prompt 5</div>
+                        </div>
+                    </div>
+                    <div class="video-item">
+                        <div class="video-title">Showcase 6</div>
+                        <div class="prompt-wrap" style="position: relative; overflow: hidden;">
+                            <div class="loading-placeholder">
+                                <div class="loading-text">Loading ...</div>
+                            </div>
+                            <video autoplay playsinline muted loop class="lazy-video" style="width:100%; display:block;"
+                                onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';"
+                                data-src="videos/interactive_video_showcases/153.mp4">
+                            </video>
+                            <div class="prompt">Interactive Prompt 6</div>
+                        </div>
+                    </div>
+                    <div class="video-item">
+                        <div class="video-title">Showcase 7</div>
+                        <div class="prompt-wrap" style="position: relative; overflow: hidden;">
+                            <div class="loading-placeholder">
+                                <div class="loading-text">Loading ...</div>
+                            </div>
+                            <video autoplay playsinline muted loop class="lazy-video" style="width:100%; display:block;"
+                                onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';"
+                                data-src="videos/interactive_video_showcases/200.mp4">
+                            </video>
+                            <div class="prompt">Interactive Prompt 7</div>
+                        </div>
+                    </div>
+                    <div class="video-item">
+                        <div class="video-title">Showcase 8</div>
+                        <div class="prompt-wrap" style="position: relative; overflow: hidden;">
+                            <div class="loading-placeholder">
+                                <div class="loading-text">Loading ...</div>
+                            </div>
+                            <video autoplay playsinline muted loop class="lazy-video" style="width:100%; display:block;"
+                                onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';"
+                                data-src="videos/interactive_video_showcases/312.mp4">
+                            </video>
+                            <div class="prompt">Interactive Prompt 8</div>
+                        </div>
+                    </div>
+                    <div class="video-item">
+                        <div class="video-title">Showcase 9</div>
+                        <div class="prompt-wrap" style="position: relative; overflow: hidden;">
+                            <div class="loading-placeholder">
+                                <div class="loading-text">Loading ...</div>
+                            </div>
+                            <video autoplay playsinline muted loop class="lazy-video" style="width:100%; display:block;"
+                                onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';"
+                                data-src="videos/interactive_video_showcases/334.mp4">
+                            </video>
+                            <div class="prompt">Interactive Prompt 9</div>
+                        </div>
+                    </div>
+                </div>
+                <p style="text-align: left; color: white; margin-top: 20px; font-size: 1.1rem; width: 100%;">
+                    The full interactive prompts can be found <a href=""
+                        style="color: #007bff; text-decoration: underline;">here</a>.
+                </p>
+            </div>
+        </section>
+
+        <!-- ========================================================== -->
+        <!--  NEW SECTION: Final                                      -->
+        <!-- ========================================================== -->
+
+        <section class="ethics-section">
+            <h3>Ethics Concerns</h3>
+            <p>
+                All videos featured in these demos are either generated by models or sourced from publicly available
+                datasets, and are intended solely for the purpose of demonstrating the technical capabilities of our
+                research. If you believe any content infringes upon rights or raises ethical concerns, please contact us
+                at
+                yuanshenghai@stu.pku.edu.cn, we will address the issue and remove the material promptly.
+            </p>
+        </section>
+
+        <section class="bibtex-section">
+            <h3>BibTeX</h3>
+            <pre class="bibtex-code">
+@article{helios,
+    title={Helios: 14B Real-Time Long Video Generation Model can be Cheaper, Faster but Keep Stronger than 1.3B ones},
+    author={Li Yuan and Yin, Yuanyang and Huang, Xinwei and Yang, Xiao and Yuan Li},
+    journal={arXiv preprint arXiv:},
+    year={2026}
+}</pre>
+        </section>
+
+</html>
