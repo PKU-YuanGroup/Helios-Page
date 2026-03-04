@@ -2,7 +2,7 @@
 <img src="https://github.com/PKU-YuanGroup/Helios-Page/blob/main/figures/logo_white.png?raw=true" width="300px">
 </div>
 
-<h2 align="center">Helios: Real Real-Time Long Video Generation Model</h2>
+<h1 align="center">Helios: Real Real-Time Long Video Generation Model</h1>
 
 <h5 align="center">⭐ 14B Real-Time Long Video Generation Model can be Cheaper, Faster but Keep Stronger than 1.3B ones ⭐</h5>
 
