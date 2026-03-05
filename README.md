@@ -8,15 +8,14 @@
 
 <h5 align="center">
 
-<!-- [![arXiv](https://img.shields.io/badge/arXiv-2501.xxxxx-b31b1b.svg?logo=arxiv)](https://arxiv.org/abs/) -->
-[![arXiv](https://img.shields.io/badge/Technical--Report-2501.xxxxx-b31b1b.svg?logo=arxiv)](https://github.com/PKU-YuanGroup/Helios-Page/blob/main/helios_technical_report.pdf)
+[![arXiv](https://img.shields.io/badge/arXiv-2603.04379-b31b1b.svg?logo=arxiv)](https://arxiv.org/abs/2603.04379)
+[![hf_paper](https://img.shields.io/badge/🤗-Paper%20In%20HF-red.svg)](https://huggingface.co/papers/2603.04379)
 [![Project Page](https://img.shields.io/badge/Project-Website-2ea44f)](https://pku-yuangroup.github.io/Helios-Page)
 [![hf_space](https://img.shields.io/badge/🤗-Gradio-00b4d8.svg)](https://huggingface.co/spaces/multimodalart/Helios-Distilled/)
 [![HuggingFace](https://img.shields.io/badge/🤗-HuggingFace-blue)](https://huggingface.co/collections/BestWishYsh/helios)
 [![ModelScope](https://img.shields.io/badge/🤖-ModelScope-purple)](https://modelscope.cn/collections/BestWishYSH/Helios)
 [![GitHub](https://img.shields.io/badge/GitHub-black?logo=github)](https://github.com/PKU-YuanGroup/Helios)
 [![GitCode](https://img.shields.io/badge/GitCodes-blue?logo=gitcode)](https://gitcode.com/weixin_47617277/Helios)
-
 
 [![Ascend](https://img.shields.io/badge/Inference-Ascend--NPU-red)](https://www.hiascend.com/)
 [![Diffusers](https://img.shields.io/badge/Inference-Diffusers-blueviolet)](https://github.com/huggingface/diffusers/pull/13208)
@@ -60,12 +59,12 @@ or you can click <a href="https://github.com/PKU-YuanGroup/Helios-Page/blob/main
 
 ## 📣 Latest News!!
 
-* ⏳⏳⏳ Release the [Technical Report](https://github.com/PKU-YuanGroup/Helios-Page/blob/main/helios_technical_report.pdf) on arXiv.
-* `[2025.03.04]` 🚀 Day-0 support for [Ascend-NPU](https://www.hiascend.com)，with sincere gratitude to the Ascend Team for their support.
-* `[2025.03.04]` 🚀 Day-0 support for [Diffusers](https://github.com/huggingface/diffusers/pull/13208)，with special thanks to the HuggingFace Team for their support.
-* `[2025.03.04]` 🚀 Day-0 support for [vLLM-Omni](https://github.com/vllm-project/vllm-omni/pull/1604)，with heartfelt gratitude to the vLLM Team for their support.
-* `[2025.03.04]` 🚀 Day-0 support for [SGLang-Diffusion](https://github.com/sgl-project/sglang/pull/19782)，with huge thanks to the SGLang Team for their support.
-* `[2025.03.04]` 🔥 We've released the training/inference code and weights of **Helios-Base**, **Helios-Mid** and **Helios-Distilled**.
+* `[2026.03.04]` 👋 We are excited to announce the release of the Helios [technical report](https://arxiv.org/abs/2603.04379) on arXiv. We welcome discussions and feedback!
+* `[2026.03.04]` 🚀 Day-0 support for [Ascend-NPU](https://www.hiascend.com)，with sincere gratitude to the Ascend Team for their support.
+* `[2026.03.04]` 🚀 Day-0 support for [Diffusers](https://github.com/huggingface/diffusers/pull/13208)，with special thanks to the HuggingFace Team for their support.
+* `[2026.03.04]` 🚀 Day-0 support for [vLLM-Omni](https://github.com/vllm-project/vllm-omni/pull/1604)，with heartfelt gratitude to the vLLM Team for their support.
+* `[2026.03.04]` 🚀 Day-0 support for [SGLang-Diffusion](https://github.com/sgl-project/sglang/pull/19782)，with huge thanks to the SGLang Team for their support.
+* `[2026.03.04]` 🔥 We've released the training/inference code and weights of **Helios-Base**, **Helios-Mid** and **Helios-Distilled**.
 
 
 ## 🔥 Friendly Links
@@ -336,7 +335,7 @@ For example, let's take Helios-Base. **(Diffusers Backend)**
 ## 🙌 Description
 
 - **Repository:** [Code](https://github.com/PKU-YuanGroup/Helios), [Page](https://pku-yuangroup.github.io/Helios-Page/)
-- **Paper:** [https://huggingface.co/papers/2411.17440](https://github.com/PKU-YuanGroup/Helios-Page/blob/main/helios_technical_report.pdf)
+- **Paper:** [https://huggingface.co/papers/2603.04379](https://huggingface.co/papers/2603.04379)
 - **Point of Contact:** [Shenghai Yuan](shyuan-cs@hotmail.com)
 
 ## ✏️ Citation
@@ -347,7 +346,7 @@ If you find our paper and code useful in your research, please consider giving a
 @article{helios,
   title={Helios: Real Real-Time Long Video Generation Model},
   author={Yuan, Shenghai and Yin, Yuanyang and Li, Zongjian and Huang, Xinwei and Yang, Xiao and Yuan, Li},
-  journal={arXiv preprint arXiv:2603.xxxxx},
+  journal={arXiv preprint arXiv:2603.04379},
   year={2026}
 }
 ```
