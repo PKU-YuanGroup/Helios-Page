@@ -256,7 +256,7 @@ For example, let's take Helios-Distilled (**Standard Pipeline**).
 
 </details>
 
-For example, let's take Helios-Distilled.
+For example, let's take Helios-Distilled (**Modular Pipeline**).
 
 <details>
   <summary>Click to expand the code</summary>
