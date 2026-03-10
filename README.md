@@ -1,5 +1,5 @@
 <div align=center>
-<img src="https://github.com/PKU-YuanGroup/Helios-Page/blob/main/figures/logo_white.png?raw=true" width="300px">
+<img src="https://raw.githubusercontent.com/SHYuanBest/shyuanbest_media/main/Helios/logo_white.png" width="300px">
 </div>
 
 <h1 align="center">Helios: Real Real-Time Long Video Generation Model</h1>
