@@ -96,7 +96,7 @@ If your work has improved **Helios** and you would like more people to see it, p
 > 💡Note: 
 > * All three models share the same architecture, but Helios-Mid and Helios-Distilled use a more aggressive multi-scale sampling pipeline to achieve better efficiency.
 > * Helios-Mid is an intermediate checkpoint generated in the process of distilling Helios-Base into Helios-Distilled, and may not meet expected quality.
-> * For Image-to-Video or Video-to-Video, since training is based on Text-to-Video, these two functions may be slightly inferior to Text-to-Video. You may enable `is_skip_first_chunk` if you find the first few chunks are static.
+> * For Image-to-Video or Video-to-Video, since training is based on Text-to-Video, these two functions may be slightly inferior to Text-to-Video. You may enable `is_skip_first_chunk` if you find the first few chunks are static or imporve the value of `image_noise_sigma_min`, `image_noise_sigma_max`, `video_noise_sigma_min`, and `video_noise_sigma_max`.
 
 
 Download models using huggingface-cli:
