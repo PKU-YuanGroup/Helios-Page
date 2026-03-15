@@ -101,7 +101,7 @@ Download models using huggingface-cli:
 pip install "huggingface_hub[cli]"
 huggingface-cli download BestWishYSH/Helios-Base --local-dir BestWishYSH/Helios-Base
 huggingface-cli download BestWishYSH/Helios-Mid --local-dir BestWishYSH/Helios-Mid
-huggingface-cli download BestWishYSH/Helios-Distilled --local-dir BestWishYSH/HeliosDistillede
+huggingface-cli download BestWishYSH/Helios-Distilled --local-dir BestWishYSH/Helios-Distilled
 ```
 
 Download models using modelscope-cli:
@@ -109,7 +109,7 @@ Download models using modelscope-cli:
 pip install modelscope
 modelscope download BestWishYSH/Helios-Base --local_dir BestWishYSH/Helios-Base
 modelscope download BestWishYSH/Helios-Mid --local_dir BestWishYSH/Helios-Mid
-modelscope download BestWishYSH/Helios-Distilled --local_dir BestWishYSH/HeliosDistillede
+modelscope download BestWishYSH/Helios-Distilled --local_dir BestWishYSH/Helios-Distilled
 ```
 
 
