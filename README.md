@@ -56,15 +56,20 @@ or you can click <a href="https://github.com/PKU-YuanGroup/Helios-Page/blob/main
 
 ## 📣 Latest News!!
 
-* `[2026.03.08]` 👋 Helios now fully supports [Group Offloading](#-group-offloading-to-save-vram) and [Context Parallelism](#-context-parallelism-on-multiple-gpus)! These features significantly optimize VRAM (**only ~6GB**) usage and enable inference across multiple GPUs with *Ulysses Attention*, *Ring Attention*, *Unified Attention*, and *Ulysses Anything Attention*.
-* `[2026.03.06]` 🚀 [Cache-DiT](https://github.com/vipshop/cache-dit/pull/834) now supports Helios, it offers Fully Cache Acceleration and Parallelism support for Helios! Special thanks to the Cache-DiT Team for their amazing work.
-* `[2026.03.06]` 🚀 We fix the Parallel Inference logits for Helios, and provide an example [here](#-context-parallelism-on-multiple-gpus). Thanks [Cache-DiT Team](https://github.com/vipshop/cache-dit/pull/836). 
-* `[2026.03.06]` 👋 We official release the [Gradio Demo](https://huggingface.co/spaces/BestWishYsh/Helios-14B-RealTime), welcome to try it.
-* `[2026.03.05]` 👋 We are excited to announce the release of the Helios [technical report](https://arxiv.org/abs/2603.04379) on arXiv. We welcome discussions and feedback!
-* `[2026.03.04]` 🚀 Day-0 support for [Ascend-NPU](https://www.hiascend.com)，with sincere gratitude to the Ascend Team for their support.
-* `[2026.03.04]` 🚀 Day-0 support for [Diffusers](https://github.com/huggingface/diffusers/pull/13208)，with special thanks to the HuggingFace Team for their support.
-* `[2026.03.04]` 🚀 Day-0 support for [SGLang-Diffusion](https://github.com/sgl-project/sglang/pull/19782)，with huge thanks to the SGLang Team for their support.
-* `[2026.03.04]` 🚀 Day-0 support for [vLLM-Omni](https://github.com/vllm-project/vllm-omni/pull/1604)，with heartfelt gratitude to the vLLM Team for their support.
+* `[2026.03.24]` 👋 A community-made, unofficial YouTube tutorial for Helios is available [here](https://www.youtube.com/watch?v=AvFniggt6qg). It covers installation on a **consumer-grade PC** and supports **4K video generation**.
+
+* `[2026.03.20]` 🚀 Helios now supports [Ahead-of-Time Compilation (AOTI)](https://huggingface.co/blog/zerogpu-aoti) on Spaces, with special thanks to the HuggingFace Team! Please refer to [this Space](https://huggingface.co/spaces/BestWishYsh/Helios-14B-RealTime-AOTI) for a usage example.
+* `[2026.03.20]` 🔧 Based on [issue #38](https://github.com/PKU-YuanGroup/Helios/issues/38), we've identified several ways to further improve Helios's performance, such as fixing the i2v train-inference inconsistency and fully enabling Easy Anti-Drifting. Please refer to [commits](https://github.com/PKU-YuanGroup/Helios/commits/main/) and [correct.yaml](./scripts/training/configs/correct.yaml) for details.
+* `[2026.03.12]` ⚡️ Please note that real-time generation performance depends not only on the GPU, but also on the CPU, memory, CUDA driver version, etc. As [tested by a user](https://github.com/PKU-YuanGroup/Helios/issues/3#issuecomment-4034710182) on better hardware with single H100, Helios can reach up to **20.89 FPS**!
+* `[2026.03.08]` 🚀 Helios now fully supports [Group Offloading](#-group-offloading-to-save-vram) and [Context Parallelism](#-context-parallelism-on-multiple-gpus)! These features significantly optimize VRAM (**only ~6GB**) usage and enable inference across multiple GPUs with *Ulysses Attention*, *Ring Attention*, *Unified Attention*, and *Ulysses Anything Attention*.
+* `[2026.03.06]` 👋 [Cache-DiT](https://github.com/vipshop/cache-dit/pull/834) now supports Helios, it offers Fully Cache Acceleration and Parallelism support for Helios! Special thanks to the Cache-DiT Team for their amazing work.
+* `[2026.03.06]` 🔧 We fix the Parallel Inference logits for Helios, and provide an example [here](#-context-parallelism-on-multiple-gpus).
+* `[2026.03.06]` 🚀 We official release the [Gradio Demo](https://huggingface.co/spaces/BestWishYsh/Helios-14B-RealTime), welcome to try it.
+* `[2026.03.05]` 🔥 We are excited to announce the release of the Helios [technical report](https://arxiv.org/abs/2603.04379) on arXiv. We welcome discussions and feedback!
+* `[2026.03.04]` 👋 Day-0 support for [Ascend-NPU](https://www.hiascend.com)，with sincere gratitude to the Ascend Team for their support.
+* `[2026.03.04]` 👋 Day-0 support for [Diffusers](https://github.com/huggingface/diffusers/pull/13208)，with special thanks to the HuggingFace Team for their support.
+* `[2026.03.04]` 👋 Day-0 support for [SGLang-Diffusion](https://github.com/sgl-project/sglang/pull/19782)，with huge thanks to the SGLang Team for their support.
+* `[2026.03.04]` 👋 Day-0 support for [vLLM-Omni](https://github.com/vllm-project/vllm-omni/pull/1604)，with heartfelt gratitude to the vLLM Team for their support.
 * `[2026.03.04]` 🔥 We've released the training/inference code and weights of **Helios-Base**, **Helios-Mid** and **Helios-Distilled**.
 
 
